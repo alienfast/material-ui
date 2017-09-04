@@ -29,6 +29,7 @@ const generateClassName = createGenerateClassName();
 // that parent has a higher specificity.
 let indexCounter = Number.MIN_SAFE_INTEGER;
 
+// $FlowFixMe 0.54.0 bug https://github.com/facebook/flow/issues/4805
 export const sheetsManager = new Map();
 
 // We use the same empty object to ref count the styles that don't need a theme object.
@@ -111,7 +112,7 @@ function withStyles(stylesOrCreator: Object, options?: Options = {}) {
         ...(listenToTheme ? themeListener.contextTypes : {}),
       };
       // Exposed for tests purposes
-      static options: ?Options = options;
+      static options: ?Options;
       // Exposed for test purposes.
       static Naked = BaseComponent;
 
@@ -225,7 +226,7 @@ function withStyles(stylesOrCreator: Object, options?: Options = {}) {
 
           if (sheetManagerTheme.refs === 0) {
             sheetManager.delete(theme);
-            sheetManagerTheme.sheet.detach();
+            this.jss.removeStyleSheet(sheetManagerTheme.sheet);
             const sheetsRegistry = this.context[ns.sheetsRegistry];
             if (sheetsRegistry) {
               sheetsRegistry.remove(sheetManagerTheme.sheet);
@@ -301,6 +302,9 @@ function withStyles(stylesOrCreator: Object, options?: Options = {}) {
     }
 
     hoistNonReactStatics(Style, BaseComponent);
+
+    // Higher specificity
+    Style.options = options;
 
     if (process.env.NODE_ENV !== 'production') {
       Style.displayName = wrapDisplayName(BaseComponent, 'withStyles');
