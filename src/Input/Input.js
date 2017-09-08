@@ -287,15 +287,15 @@ export type Props = {
   /**
    * @ignore
    */
-  onFocus?: (event: SyntheticUIEvent<>) => void,
+  onFocus?: (event: SyntheticFocusEvent<>) => void,
   /**
    * @ignore
    */
-  onKeyDown?: (event: SyntheticUIEvent<>) => void,
+  onKeyDown?: (event: SyntheticKeyboardEvent<>) => void,
   /**
    * @ignore
    */
-  onKeyUp?: (event: SyntheticUIEvent<>) => void,
+  onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   /**
    * TODO
    */
@@ -350,10 +350,14 @@ class Input extends React.Component<AllProps, State> {
     // Fix SSR issue with the go back feature of the browsers.
     // Let's say you start filling the input with "foo", you change the page then after comes back.
     // The browser will reset the input value to "foo", but we also need to tell React about it.
-    const event = new Event('input', {
-      bubbles: true,
-    });
-    this.input.dispatchEvent(event);
+
+    // Note: custom inputComponents may not implement dispatchEvent, so we must check first.
+    if (this.input.dispatchEvent) {
+      const event = new Event('input', {
+        bubbles: true,
+      });
+      this.input.dispatchEvent(event);
+    }
   }
 
   componentWillUpdate(nextProps) {
