@@ -9,7 +9,6 @@ import withStyles from '../styles/withStyles';
 export const styles = (theme: Object) => ({
   root: {
     flex: '1 1 auto',
-    overflow: 'auto',
     listStyle: 'none',
     margin: 0,
     padding: 0,
@@ -74,8 +73,8 @@ type AllProps = DefaultProps & Props;
 
 class List extends React.Component<AllProps, void> {
   props: AllProps;
+
   static defaultProps = {
-    classes: {},
     component: 'ul',
     dense: false,
     disablePadding: false,

@@ -9,7 +9,7 @@
 |:-----|:-----|:--------|:------------|
 | centerRipple | boolean | false | If `true`, the ripples will be centered. They won't start at the cursor interaction position. |
 | children | Node |  | The content of the component. |
-| classes | Object | {} | Useful to extend the style applied to components. |
+| classes | Object |  | Useful to extend the style applied to components. |
 | component | union:&nbsp;string<br>&nbsp;ComponentType<*><br> |  | The component used for the root node. Either a string to use a DOM element or a component. The default value is a `button`. |
 | disableRipple | boolean | false | If `true`, the ripple effect will be disabled. |
 | disabled | boolean |  | If `true`, the base button will be disabled. |
@@ -17,7 +17,7 @@
 | keyboardFocusedClassName | string |  | The CSS class applied while the component is keyboard focused. |
 | onKeyboardFocus | signature |  | Callback fired when the component is focused with a keyboard. We trigger a `onFocus` callback too. |
 
-Any other properties supplied will be spread to the root element.
+Any other properties supplied will be [spread to the root element](/customization/api#spread).
 
 ## CSS API
 

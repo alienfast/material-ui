@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import { isDirty } from '../Input/Input';
-import { isMuiComponent } from '../utils/reactHelpers';
+import { isMuiElement } from '../utils/reactHelpers';
 
 export const styles = (theme: Object) => ({
   root: {
@@ -85,7 +85,7 @@ export type Props = {
    */
   required?: boolean,
   /**
-   * If `dense` | `normal`, will adjust vertical spacing of this and contained components.
+   * If `dense` or `normal`, will adjust vertical spacing of this and contained components.
    */
   margin?: 'none' | 'dense' | 'normal',
 };
@@ -104,7 +104,6 @@ class FormControl extends React.Component<AllProps, State> {
   props: AllProps;
 
   static defaultProps = {
-    classes: {},
     component: 'div',
     disabled: false,
     error: false,
@@ -148,7 +147,7 @@ class FormControl extends React.Component<AllProps, State> {
     const { children } = this.props;
     if (children) {
       React.Children.forEach(children, child => {
-        if (isMuiComponent(child, 'Input') && isDirty(child.props, true)) {
+        if (isMuiElement(child, ['Input', 'Select']) && isDirty(child.props, true)) {
           this.setState({ dirty: true });
         }
       });
