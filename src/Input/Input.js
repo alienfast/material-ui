@@ -271,31 +271,31 @@ export type Props = {
   /**
    * @ignore
    */
-  onBlur?: Function,
+  onBlur?: (event: SyntheticUIEvent<>) => void,
   /**
    * TODO
    */
-  onChange?: Function,
+  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => void,
   /**
    * TODO
    */
-  onClean?: Function,
+  onClean?: () => void,
   /**
    * TODO
    */
-  onDirty?: Function,
+  onDirty?: () => void,
   /**
    * @ignore
    */
-  onFocus?: Function,
+  onFocus?: (event: SyntheticUIEvent<>) => void,
   /**
    * @ignore
    */
-  onKeyDown?: Function,
+  onKeyDown?: (event: SyntheticUIEvent<>) => void,
   /**
    * @ignore
    */
-  onKeyUp?: Function,
+  onKeyUp?: (event: SyntheticUIEvent<>) => void,
   /**
    * TODO
    */
@@ -350,9 +350,10 @@ class Input extends React.Component<AllProps, State> {
     // Fix SSR issue with the go back feature of the browsers.
     // Let's say you start filling the input with "foo", you change the page then after comes back.
     // The browser will reset the input value to "foo", but we also need to tell React about it.
-    this.handleChange({
-      target: this.input,
+    const event = new Event('input', {
+      bubbles: true,
     });
+    this.input.dispatchEvent(event);
   }
 
   componentWillUpdate(nextProps) {
@@ -378,7 +379,7 @@ class Input extends React.Component<AllProps, State> {
     }
   };
 
-  handleChange = event => {
+  handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (!this.isControlled()) {
       this.checkDirty(this.input);
     } // else perform in the willUpdate
