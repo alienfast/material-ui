@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+export type ClassNameMap<Names extends string = string> = Record<Names, string>;
+
 /**
  * Component exposed by `material-ui` are usually wrapped
  * with the `withStyles` HOC and allow customization via
@@ -8,15 +10,16 @@ import * as React from 'react';
  * - `className`
  * - `classes`
  * - `style`
+ * - `innerRef`
  */
-export interface StyledComponentProps<StyleClasses> {
+export interface StyledComponentProps<Names extends string = string> {
   className?: string;
-  classes?: StyleClasses;
+  classes?: Partial<ClassNameMap<Names>>;
   style?: Partial<React.CSSProperties>;
+  innerRef?: React.Ref<any>;
 }
-export class StyledComponent<P, C = Object> extends React.Component<
-  P & StyledComponentProps<C>
-> {}
+export type StyledComponent<P = {}, Names extends string = string> =
+  React.ComponentType<P & StyledComponentProps<Names>>
 
 export type Contrast = 'light' | 'dark' | 'brown';
 export interface Color {
@@ -92,7 +95,7 @@ export { CircularProgress, LinearProgress } from './Progress';
 export { default as Radio, RadioGroup } from './Radio';
 export { default as Select } from './Select';
 export { default as Snackbar, SnackbarContent } from './Snackbar';
-export { MuiThemeProvider, withStyles, withTheme, createMuiTheme } from './styles';
+export { MuiThemeProvider, withStyles, WithStyles, withTheme, createMuiTheme } from './styles';
 
 import * as colors from './colors';
 
@@ -112,3 +115,5 @@ export { default as Tabs, Tab } from './Tabs';
 export { default as Typography } from './Typography';
 export { default as TextField } from './TextField';
 export { default as Toolbar } from './Toolbar';
+
+export { default as Tooltip } from './Tooltip';

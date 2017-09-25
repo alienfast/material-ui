@@ -1,14 +1,16 @@
 import * as React from 'react';
 import { StyledComponent } from '..';
 
-export interface AvatarProps {
+export interface AvatarProps extends React.HTMLAttributes<HTMLDivElement> {
   alt?: string;
   childrenClassName?: string;
-  component?: React.ReactNode;
+  component?: React.ReactType;
   imgProps?: Object;
   sizes?: string;
   src?: string;
   srcSet?: string;
 }
 
-export default class Avatar extends StyledComponent<AvatarProps> {}
+declare const Avatar: StyledComponent<AvatarProps>;
+
+export default Avatar;

@@ -13,8 +13,8 @@ export const styles = (theme: Object) => ({
   root: {
     ...theme.typography.button,
     maxWidth: 264,
+    position: 'relative',
     minWidth: 72,
-    background: 'none',
     padding: 0,
     height: 48,
     flex: 'none',
@@ -56,6 +56,13 @@ export const styles = (theme: Object) => ({
   },
   fullWidth: {
     flexGrow: 1,
+  },
+  wrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'column',
   },
   labelContainer: {
     paddingTop: 6,
@@ -107,6 +114,12 @@ export type Props = {
    */
   icon?: Element<*>,
   /**
+   * @ignore
+   * For server side rendering consideration, we let the selected tab
+   * render the indicator.
+   */
+  indicator?: Element<*>,
+  /**
    * The label element.
    */
   label?: Element<*>,
@@ -136,14 +149,11 @@ export type Props = {
   value?: any,
 };
 
-type AllProps = DefaultProps & Props;
-
 type State = {
   wrappedText: boolean,
 };
 
-class Tab extends React.Component<AllProps, State> {
-  props: AllProps;
+class Tab extends React.Component<DefaultProps & Props, State> {
   static defaultProps = {
     disabled: false,
   };
@@ -197,6 +207,7 @@ class Tab extends React.Component<AllProps, State> {
       disabled,
       fullWidth,
       icon: iconProp,
+      indicator,
       label: labelProp,
       onChange,
       selected,
@@ -268,8 +279,11 @@ class Tab extends React.Component<AllProps, State> {
         {...other}
         onClick={this.handleChange}
       >
-        {icon}
-        {label}
+        <span className={classes.wrapper}>
+          {icon}
+          {label}
+        </span>
+        {indicator}
       </ButtonBase>
     );
   }

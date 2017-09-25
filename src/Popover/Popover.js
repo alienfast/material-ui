@@ -50,7 +50,7 @@ function getTransformOriginValue(transformOrigin) {
     .join(' ');
 }
 
-// Sum the scrollTop between two elements
+// Sum the scrollTop between two elements.
 function getScrollParent(parent, child) {
   let element = child;
   let scrollTop = 0;
@@ -134,11 +134,6 @@ export type Props = {
    */
   getContentAnchorEl?: Function,
   /**
-   * If `true`, the Popover will be rendered as a modal with
-   * scroll locking, focus trapping and a clickaway layer beneath
-   */
-  modal?: boolean,
-  /**
    * Callback fired before the component is entering
    */
   onEnter?: TransitionCallback,
@@ -195,17 +190,12 @@ export type Props = {
   transitionDuration?: number | 'auto',
 };
 
-type AllProps = DefaultProps & Props;
-
-class Popover extends React.Component<AllProps, void> {
-  props: AllProps;
-
+class Popover extends React.Component<DefaultProps & Props> {
   static defaultProps = {
     anchorOrigin: {
       vertical: 'top',
       horizontal: 'left',
     },
-    modal: true,
     open: false,
     transformOrigin: {
       vertical: 'top',
@@ -365,14 +355,12 @@ class Popover extends React.Component<AllProps, void> {
       exitedClassName,
       exitingClassName,
       getContentAnchorEl,
-      modal,
       onEnter,
       onEntering,
       onEntered,
       onExit,
       onExiting,
       onExited,
-      onRequestClose,
       open,
       PaperProps,
       role,
@@ -382,7 +370,7 @@ class Popover extends React.Component<AllProps, void> {
     } = this.props;
 
     return (
-      <Modal show={open} backdropInvisible onRequestClose={onRequestClose} {...other}>
+      <Modal show={open} backdropInvisible {...other}>
         <Grow
           in={open}
           enteredClassName={enteredClassName}

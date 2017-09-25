@@ -5,8 +5,9 @@ export interface ListSubheaderProps
   extends React.HTMLAttributes<HTMLDivElement> {
   color?: 'default' | 'primary' | 'inherit';
   inset?: boolean;
+  disableSticky?: boolean;
 }
 
-export default class ListSubheader extends StyledComponent<
-  ListSubheaderProps
-> {}
+declare const ListSubheader: StyledComponent<ListSubheaderProps>;
+
+export default ListSubheader;

@@ -2,8 +2,47 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
+import type { ElementType, Node } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
+
+export type Context = {
+  table: Object,
+};
+
+type Default = {
+  padding: 'default' | 'checkbox' | 'dense' | 'none',
+  numeric: boolean,
+  component: ElementType,
+};
+
+export type Props = {
+  /**
+   * The table cell contents.
+   */
+  children?: Node,
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes: Object,
+  /**
+   * @ignore
+   */
+  className?: string,
+  /**
+   * The component used for the root node.
+   * Either a string to use a DOM element or a component.
+   */
+  component?: ElementType,
+  /**
+   * If `true`, content will align to the right.
+   */
+  numeric?: boolean,
+  /**
+   * Sets the padding applied to the cell.
+   */
+  padding?: 'default' | 'checkbox' | 'dense' | 'none',
+};
 
 export const styles = (theme: Object) => ({
   root: {
@@ -19,6 +58,7 @@ export const styles = (theme: Object) => ({
   },
   head: {
     whiteSpace: 'pre',
+    fontWeight: theme.typography.fontWeightMedium,
   },
   padding: {
     padding: `0 ${theme.spacing.unit * 7}px 0 ${theme.spacing.unit * 3}px`,
@@ -26,25 +66,25 @@ export const styles = (theme: Object) => ({
       paddingRight: theme.spacing.unit * 3,
     },
   },
-  compact: {
+  dense: {
     paddingRight: theme.spacing.unit * 3,
   },
   checkbox: {
     paddingLeft: 12,
     paddingRight: 12,
   },
-  footer: {},
+  footer: {
+    borderBottom: 0,
+  },
 });
 
-function TableCell(props, context) {
+function TableCell(props: Default & Props, context: Context) {
   const {
     classes,
     className: classNameProp,
     children,
-    compact,
-    checkbox,
     numeric,
-    disablePadding,
+    padding,
     component,
     ...other
   } = props;
@@ -60,9 +100,9 @@ function TableCell(props, context) {
     classes.root,
     {
       [classes.numeric]: numeric,
-      [classes.compact]: compact,
-      [classes.checkbox]: checkbox,
-      [classes.padding]: !disablePadding,
+      [classes.dense]: padding === 'dense',
+      [classes.checkbox]: padding === 'checkbox',
+      [classes.padding]: padding !== 'none',
       [classes.head]: table && table.head,
       [classes.footer]: table && table.footer,
     },
@@ -76,52 +116,14 @@ function TableCell(props, context) {
   );
 }
 
-TableCell.propTypes = {
-  /**
-   * If `true`, the cell padding will be adjusted to accommodate a checkbox.
-   */
-  checkbox: PropTypes.bool,
-  /**
-   * The table cell contents.
-   */
-  children: PropTypes.node,
-  /**
-   * Useful to extend the style applied to components.
-   */
-  classes: PropTypes.object.isRequired,
-  /**
-   * @ignore
-   */
-  className: PropTypes.string,
-  /**
-   * If `true`, compact cell padding will be used to accommodate more content.
-   */
-  compact: PropTypes.bool,
-  /**
-   * The component used for the root node.
-   * Either a string to use a DOM element or a component.
-   */
-  component: PropTypes.string,
-  /**
-   * If `true`, left/right cell padding will be disabled.
-   */
-  disablePadding: PropTypes.bool,
-  /**
-   * If `true`, content will align to the right.
-   */
-  numeric: PropTypes.bool,
-};
-
 TableCell.defaultProps = {
-  checkbox: false,
-  compact: false,
-  numeric: false,
-  disablePadding: false,
   component: null,
+  numeric: false,
+  padding: 'default',
 };
 
 TableCell.contextTypes = {
-  table: PropTypes.object,
+  table: PropTypes.object.isRequired,
 };
 
 export default withStyles(styles, { name: 'MuiTableCell' })(TableCell);

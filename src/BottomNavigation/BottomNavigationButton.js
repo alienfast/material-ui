@@ -19,7 +19,6 @@ export const styles = (theme: Object) => ({
     paddingRight: 12,
     minWidth: 80,
     maxWidth: 168,
-    background: 'none',
     color: theme.palette.text.secondary,
     flex: '1',
   },
@@ -28,7 +27,14 @@ export const styles = (theme: Object) => ({
     color: theme.palette.primary[500],
   },
   selectedIconOnly: {
-    paddingTop: 16,
+    paddingTop: theme.spacing.unit * 2,
+  },
+  wrapper: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: '100%',
+    flexDirection: 'column',
   },
   label: {
     fontFamily: theme.typography.fontFamily,
@@ -93,10 +99,7 @@ export type Props = {
   value?: any,
 };
 
-type AllProps = DefaultProps & Props;
-
-class BottomNavigationButton extends React.Component<AllProps> {
-  props: AllProps;
+class BottomNavigationButton extends React.Component<DefaultProps & Props> {
   handleChange = event => {
     const { onChange, value, onClick } = this.props;
 
@@ -150,8 +153,10 @@ class BottomNavigationButton extends React.Component<AllProps> {
 
     return (
       <ButtonBase className={className} focusRipple {...other} onClick={this.handleChange}>
-        {icon}
-        <span className={labelClassName}>{label}</span>
+        <span className={classes.wrapper}>
+          {icon}
+          <span className={labelClassName}>{label}</span>
+        </span>
       </ButtonBase>
     );
   }

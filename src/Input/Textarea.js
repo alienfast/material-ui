@@ -81,8 +81,6 @@ export type Props = {
   value?: string,
 };
 
-type AllProps = DefaultProps & Props;
-
 type State = {
   height: ?number,
 };
@@ -90,9 +88,7 @@ type State = {
 /**
  * @ignore - internal component.
  */
-class Textarea extends React.Component<AllProps, State> {
-  props: AllProps;
-
+class Textarea extends React.Component<DefaultProps & Props, State> {
   shadow: ?HTMLInputElement;
 
   singlelineShadow: ?HTMLInputElement;
@@ -217,7 +213,7 @@ class Textarea extends React.Component<AllProps, State> {
         <textarea
           ref={this.handleRefSinglelineShadow}
           className={classnames(classes.shadow, classes.textarea)}
-          tabIndex="-1"
+          tabIndex={-1}
           rows="1"
           readOnly
           aria-hidden="true"
@@ -226,7 +222,7 @@ class Textarea extends React.Component<AllProps, State> {
         <textarea
           ref={this.handleRefShadow}
           className={classnames(classes.shadow, classes.textarea)}
-          tabIndex="-1"
+          tabIndex={-1}
           rows={rows}
           aria-hidden="true"
           readOnly

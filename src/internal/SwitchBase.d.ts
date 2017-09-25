@@ -16,11 +16,11 @@ export interface SwitchBaseProps {
   inputRef?: React.Ref<any>;
   name?: string;
   onChange?: (event: React.ChangeEvent<{}>, checked: boolean) => void;
-  tabIndex?: string;
+  tabIndex?: number;
   value?: string;
 }
 
-export class SwitchBase extends StyledComponent<SwitchBaseProps> {}
+export type SwitchBase = StyledComponent<SwitchBaseProps>
 
 export interface CreateSwitchBaseOptions {
   defaultIcon?: React.ReactNode;

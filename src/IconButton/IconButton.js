@@ -12,9 +12,6 @@ import { isMuiElement } from '../utils/reactHelpers';
 
 export const styles = (theme: Object) => ({
   root: {
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     textAlign: 'center',
     flex: '0 0 auto',
     fontSize: 24,
@@ -22,7 +19,6 @@ export const styles = (theme: Object) => ({
     height: theme.spacing.unit * 6,
     padding: 0,
     borderRadius: '50%',
-    backgroundColor: 'transparent',
     color: theme.palette.action.active,
     transition: theme.transitions.create('background-color', {
       duration: theme.transitions.duration.shortest,

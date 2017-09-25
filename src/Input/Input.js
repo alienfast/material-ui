@@ -57,6 +57,7 @@ export const styles = (theme: Object) => {
       position: 'relative',
       fontFamily: theme.typography.fontFamily,
       color: theme.palette.input.inputText,
+      paddingBottom: 2,
     },
     formControl: {
       'label + &': {
@@ -136,7 +137,6 @@ export const styles = (theme: Object) => {
     },
     focused: {},
     underline: {
-      paddingBottom: 2,
       '&:before': {
         backgroundColor: theme.palette.input.bottomLine,
         left: 0,
@@ -172,6 +172,8 @@ export const styles = (theme: Object) => {
     },
     inputSingleline: {
       height: '1em',
+    },
+    inputSearch: {
       appearance: 'textfield', // Improve type search style.
     },
     inputMultiline: {
@@ -255,7 +257,7 @@ export type Props = {
    * If `dense`, will adjust vertical spacing. This is normally obtained via context from
    * FormControl.
    */
-  margin?: 'dense',
+  margin?: 'dense' | 'none',
   /**
    * If `true`, a textarea element will be rendered.
    */
@@ -271,11 +273,13 @@ export type Props = {
   /**
    * @ignore
    */
-  onBlur?: (event: SyntheticUIEvent<>) => void,
+  onBlur?: (event: SyntheticFocusEvent<>) => void,
   /**
-   * TODO
+   * Callback fired when the value is changed.
+   *
+   * @param {object} event The event source of the callback
    */
-  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => void,
+  onChange?: (event: SyntheticInputEvent<>) => void,
   /**
    * TODO
    */
@@ -297,7 +301,7 @@ export type Props = {
    */
   onKeyUp?: (event: SyntheticKeyboardEvent<>) => void,
   /**
-   * TODO
+   * The short hint displayed in the input before the user enters a value.
    */
   placeholder?: string,
   /**
@@ -318,15 +322,11 @@ export type Props = {
   value?: string | number | Array<string | number>,
 };
 
-type AllProps = DefaultProps & Props;
-
 type State = {
   focused: boolean,
 };
 
-class Input extends React.Component<AllProps, State> {
-  props: AllProps;
-
+class Input extends React.Component<DefaultProps & Props, State> {
   static muiName = 'Input';
 
   static defaultProps = {
@@ -347,16 +347,8 @@ class Input extends React.Component<AllProps, State> {
   }
 
   componentDidMount() {
-    // Fix SSR issue with the go back feature of the browsers.
-    // Let's say you start filling the input with "foo", you change the page then after comes back.
-    // The browser will reset the input value to "foo", but we also need to tell React about it.
-
-    // Note: custom inputComponents may not implement dispatchEvent, so we must check first.
-    if (this.input.dispatchEvent) {
-      const event = new Event('input', {
-        bubbles: true,
-      });
-      this.input.dispatchEvent(event);
+    if (!this.isControlled()) {
+      this.checkDirty(this.input);
     }
   }
 
@@ -383,10 +375,12 @@ class Input extends React.Component<AllProps, State> {
     }
   };
 
-  handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {
+  handleChange = (event: SyntheticInputEvent<>) => {
     if (!this.isControlled()) {
       this.checkDirty(this.input);
-    } // else perform in the willUpdate
+    }
+
+    // Perform in the willUpdate
     if (this.props.onChange) {
       this.props.onChange(event);
     }
@@ -502,6 +496,7 @@ class Input extends React.Component<AllProps, State> {
       {
         [classes.inputDisabled]: disabled,
         [classes.inputSingleline]: !multiline,
+        [classes.inputSearch]: type === 'search',
         [classes.inputMultiline]: multiline,
         [classes.inputDense]: margin === 'dense',
       },

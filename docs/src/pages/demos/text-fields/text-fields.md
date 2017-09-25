@@ -9,13 +9,17 @@ Users may enter text, numbers, or mixed-format types of input.
 
 ## TextField
 
-The `<TextField>` wrapper component is a complete form control including a label, input and help text.
+The `TextField` wrapper component is a complete form control including a label, input and help text.
 
 {{demo='pages/demos/text-fields/TextFields.js'}}
 
 ## Components
 
 `TextField` is composed of smaller components (`FormControl`, `InputLabel`, `Input`, and `FormHelperText`) that you can leverage directly to significantly customize your form inputs.
+
+You might also have noticed that some native HTML input properties are missing from the `TextField` component.
+This is on purpose.
+The component takes care of the most used properties, then it's up to the user to use the underlying component shown in the following demo. Still, you can use `inputProps` (and `InputProps`, `InputLabelProps` properties) if you want to avoid some boilerplate.
 
 {{demo='pages/demos/text-fields/ComposedTextField.js'}}
 
@@ -30,3 +34,10 @@ other styles to meet the specification.
 ## Inputs
 
 {{demo='pages/demos/text-fields/Inputs.js'}}
+
+## Formatted inputs
+
+We demonstrate how you could be using third-party libraries to [format your input](https://material.io/guidelines/components/text-fields.html#text-fields-input-types).
+Here, we are using [react-text-mask](https://github.com/text-mask/text-mask) and [react-number-format](https://github.com/s-yadav/react-number-format).
+
+{{demo='pages/demos/text-fields/FormattedInputs.js'}}

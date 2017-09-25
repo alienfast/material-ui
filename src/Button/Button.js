@@ -2,7 +2,7 @@
 // @inheritedComponent ButtonBase
 
 import React from 'react';
-import type { ComponentType, Node } from 'react';
+import type { ElementType, Node } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import { fade } from '../styles/colorManipulator';
@@ -12,16 +12,12 @@ export const styles = (theme: Object) => ({
   root: {
     ...theme.typography.button,
     lineHeight: '1em',
-    display: 'inline-flex',
-    alignItems: 'center',
-    justifyContent: 'center',
     boxSizing: 'border-box',
     minWidth: 88,
     minHeight: 36,
     padding: `11px ${theme.spacing.unit * 2}px`,
     borderRadius: 2,
     color: theme.palette.text.primary,
-    backgroundColor: 'transparent',
     transition: theme.transitions.create(['background-color', 'box-shadow'], {
       duration: theme.transitions.duration.short,
     }),
@@ -187,7 +183,7 @@ export type Props = {
    * Either a string to use a DOM element or a component.
    * The default value is a `button`.
    */
-  component?: string | ComponentType<*>,
+  component?: ElementType,
   /**
    * Uses a smaller minWidth, ideal for things like card actions.
    */
@@ -224,9 +220,7 @@ export type Props = {
   type?: string,
 };
 
-type AllProps = DefaultProps & Props;
-
-function Button(props: AllProps) {
+function Button(props: DefaultProps & Props) {
   const {
     children,
     classes,

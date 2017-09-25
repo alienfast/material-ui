@@ -10,7 +10,7 @@
 | <span style="color: #31a148">children *</span> | Node |  | The content of the button. |
 | classes | Object |  | Useful to extend the style applied to components. |
 | color | union:&nbsp;'default', 'inherit', 'primary', 'accent', 'contrast'<br> | 'default' | The color of the component. It's using the theme palette when that makes sense. |
-| component | union:&nbsp;string<br>&nbsp;ComponentType<*><br> |  | The component used for the root node. Either a string to use a DOM element or a component. The default value is a `button`. |
+| component | ElementType |  | The component used for the root node. Either a string to use a DOM element or a component. The default value is a `button`. |
 | dense | boolean | false | Uses a smaller minWidth, ideal for things like card actions. |
 | disableFocusRipple | boolean | false | If `true`, the  keyboard focus ripple will be disabled. `disableRipple` must also be true. |
 | disableRipple | boolean | false | If `true`, the ripple effect will be disabled. |
@@ -23,7 +23,7 @@ Any other properties supplied will be [spread to the root element](/customizatio
 
 ## CSS API
 
-You can overrides all the class names injected by Material-UI thanks to the `classes` property.
+You can override all the class names injected by Material-UI thanks to the `classes` property.
 This property accepts the following keys:
 - `root`
 - `dense`

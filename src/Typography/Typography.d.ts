@@ -4,7 +4,7 @@ import { Style, TextStyle } from '../styles/createTypography';
 
 export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   align?: PropTypes.Alignment;
-  component?: React.ReactNode;
+  component?: React.ReactType;
   color?: PropTypes.Color | 'secondary';
   gutterBottom?: boolean;
   headlineMapping?: { [type in TextStyle]: string };
@@ -13,4 +13,6 @@ export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   type?: Style | 'caption' | 'button';
 }
 
-export default class Typography extends StyledComponent<TypographyProps> {}
+declare const Typography: StyledComponent<TypographyProps>;
+
+export default Typography;

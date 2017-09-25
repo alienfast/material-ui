@@ -6,9 +6,11 @@
     "sourceMap": true,
     "jsx": "react",
     "moduleResolution": "node",
+    "strictNullChecks": true,
     "forceConsistentCasingInFileNames": true,
     "suppressImplicitAnyIndexErrors": true,
-    "noEmit": true
+    "noEmit": true,
+    "experimentalDecorators": true
   },
   "include": ["src/**/*", "test/typescript/*"]
 }

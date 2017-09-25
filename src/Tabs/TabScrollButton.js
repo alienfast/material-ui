@@ -10,7 +10,6 @@ import KeyboardArrowRight from '../svg-icons/KeyboardArrowRight';
 
 export const styles = (theme: Object) => ({
   root: {
-    background: 'none',
     color: 'inherit',
     flex: `0 0 ${theme.spacing.unit * 7}px`,
   },
@@ -29,7 +28,7 @@ function TabScrollButton(props) {
   }
 
   return (
-    <ButtonBase className={className} onClick={onClick} tabIndex="-1" {...other}>
+    <ButtonBase className={className} onClick={onClick} tabIndex={-1} {...other}>
       {direction === 'left' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
     </ButtonBase>
   );

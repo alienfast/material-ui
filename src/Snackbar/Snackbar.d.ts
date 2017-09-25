@@ -10,6 +10,7 @@ export type SnackbarProps = {
   action?: React.ReactElement<any> | React.ReactElement<any>[];
   anchorOrigin?: Origin;
   autoHideDuration?: number;
+  resumeHideDuration?: number;
   enterTransitionDuration?: number;
   key?: number;
   leaveTransitionDuration?: number;
@@ -23,4 +24,6 @@ export type SnackbarProps = {
 } & Partial<TransitionHandlers> &
   React.HTMLAttributes<HTMLDivElement>;
 
-export default class Snackbar extends StyledComponent<SnackbarProps> {}
+declare const Snackbar: StyledComponent<SnackbarProps>;
+
+export default Snackbar;

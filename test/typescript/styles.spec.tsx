@@ -1,13 +1,15 @@
 import * as React from 'react';
+import { StyledComponent } from '../../src';
 import {
   withStyles,
-  StyleRules,
+  WithStyles,
   createMuiTheme,
   MuiThemeProvider,
   Theme,
   withTheme,
 } from '../../src/styles';
 import Button from '../../src/Button/Button';
+import { StyledComponentProps } from '../../src/index'
 
 const styles = ({ palette, spacing }) => ({
   root: {
@@ -21,30 +23,29 @@ interface StyledComponentClassNames {
   root: string;
 }
 
-interface StyledComponentProps {
+interface NonStyleProps {
   text: string;
 }
 
-const Component: React.SFC<
-  StyledComponentProps & { classes: StyledComponentClassNames }
-> = ({ classes, text }) => <div className={classes.root}>{text}</div>;
+const StyledSFC = withStyles(styles)<NonStyleProps>(
+  ({ classes, text }) => (
+    <div className={classes.root}>
+      {text}
+    </div>
+  )
+);
 
-const StyledComponent = withStyles<
-  StyledComponentProps,
-  StyledComponentClassNames
->(styles)(Component);
-
-<StyledComponent text="I am styled!" />;
+<StyledSFC text="I am styled!" />;
 
 // Also works with a plain object
 
-const stylesAsPojo: StyleRules = {
+const stylesAsPojo = {
   root: {
     background: 'hotpink',
   },
 };
 
-const AnotherStyledComponent = withStyles<{}, StyledComponentClassNames>({
+const AnotherStyledSFC = withStyles({
   root: { background: 'hotpink' },
 })(({ classes }) => <div className={classes.root}>Stylish!</div>);
 
@@ -77,16 +78,19 @@ const customTheme = createMuiTheme({
 function OverridesTheme() {
   return (
     <MuiThemeProvider theme={theme}>
-      <Button>{'Overrides'}</Button>
+      <Button>
+        {'Overrides'}
+      </Button>
     </MuiThemeProvider>
   );
 }
 
 // withTheme
 
-const ThemedComponent: React.SFC<{ theme: Theme }> = ({ theme }) => (
-  <div>{theme.spacing.unit}</div>
-);
+const ThemedComponent: React.SFC<{ theme: Theme }> = ({ theme }) =>
+  <div>
+    {theme.spacing.unit}
+  </div>;
 const ComponentWithTheme = withTheme(ThemedComponent);
 
 // withStyles + withTheme
@@ -95,10 +99,26 @@ interface AllTheProps {
   classes: StyledComponentClassNames;
 }
 
-const AllTheStyles: React.SFC<AllTheProps> = ({ theme, classes }) => (
-  <div className={classes.root}>{theme.palette.text.primary}</div>
-);
+const AllTheStyles: React.SFC<AllTheProps> = ({ theme, classes }) =>
+  <div className={classes.root}>
+    {theme.palette.text.primary}
+  </div>;
 
 const AllTheComposition = withTheme(
-  withStyles<{ theme: Theme }, StyledComponentClassNames>(styles)(AllTheStyles)
+  withStyles(styles)(AllTheStyles)
 );
+
+@withStyles(styles)
+class DecoratedComponent extends React.Component<NonStyleProps & StyledComponentProps<'root'>> {
+  render() {
+    const { classes, text } = this.props;
+    return (
+      <div className={classes!.root}>
+        {text}
+      </div>
+    );
+  }
+}
+
+// no 'classes' property required at element creation time (#8267)
+<DecoratedComponent text="foo" />

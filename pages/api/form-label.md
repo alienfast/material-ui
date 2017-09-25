@@ -9,7 +9,7 @@
 |:-----|:-----|:--------|:------------|
 | children | Node |  | The content of the component. |
 | classes | Object |  | Useful to extend the style applied to components. |
-| component | union:&nbsp;string<br>&nbsp;ComponentType<*><br> | 'label' | The component used for the root node. Either a string to use a DOM element or a component. |
+| component | ElementType | 'label' | The component used for the root node. Either a string to use a DOM element or a component. |
 | disabled | boolean |  | If `true`, the label should be displayed in a disabled state. |
 | error | boolean |  | If `true`, the label should be displayed in an error state. |
 | focused | boolean |  | If `true`, the input of this label is focused (used by `FormGroup` components). |
@@ -19,7 +19,7 @@ Any other properties supplied will be [spread to the root element](/customizatio
 
 ## CSS API
 
-You can overrides all the class names injected by Material-UI thanks to the `classes` property.
+You can override all the class names injected by Material-UI thanks to the `classes` property.
 This property accepts the following keys:
 - `root`
 - `focused`

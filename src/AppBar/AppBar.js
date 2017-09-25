@@ -14,6 +14,7 @@ export const styles = (theme: Object) => ({
     flexDirection: 'column',
     width: '100%',
     zIndex: theme.zIndex.appBar,
+    flexShrink: 0,
   },
   positionFixed: {
     position: 'fixed',
@@ -74,9 +75,7 @@ export type Props = {
   position?: 'static' | 'fixed' | 'absolute',
 };
 
-type AllProps = DefaultProps & Props;
-
-function AppBar(props: AllProps) {
+function AppBar(props: DefaultProps & Props) {
   const { children, classes, className: classNameProp, color, position, ...other } = props;
 
   const className = classNames(

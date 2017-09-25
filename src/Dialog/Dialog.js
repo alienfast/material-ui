@@ -28,13 +28,16 @@ export const styles = (theme: Object) => ({
     },
   },
   paperWidthXs: {
-    maxWidth: theme.breakpoints.getWidth('xs'),
+    maxWidth: theme.breakpoints.values.xs,
   },
   paperWidthSm: {
-    maxWidth: theme.breakpoints.getWidth('sm'),
+    maxWidth: theme.breakpoints.values.sm,
   },
   paperWidthMd: {
-    maxWidth: theme.breakpoints.getWidth('md'),
+    maxWidth: theme.breakpoints.values.md,
+  },
+  fullWidth: {
+    width: '100%',
   },
   fullScreen: {
     margin: 0,
@@ -91,6 +94,10 @@ export type Props = {
    */
   maxWidth?: 'xs' | 'sm' | 'md',
   /**
+   * If specified, stretches dialog to max width.
+   */
+  fullWidth?: boolean,
+  /**
    * Callback fired when the backdrop is clicked.
    */
   onBackdropClick?: Function,
@@ -138,12 +145,10 @@ export type Props = {
   transition?: Node,
 };
 
-type AllProps = DefaultProps & Props;
-
 /**
  * Dialogs are overlaid modal paper based components with a backdrop.
  */
-function Dialog(props: AllProps) {
+function Dialog(props: DefaultProps & Props) {
   const {
     children,
     classes,
@@ -154,6 +159,7 @@ function Dialog(props: AllProps) {
     enterTransitionDuration,
     leaveTransitionDuration,
     maxWidth,
+    fullWidth,
     open,
     onBackdropClick,
     onEscapeKeyUp,
@@ -204,7 +210,10 @@ function Dialog(props: AllProps) {
           className={classNames(
             classes.paper,
             classes[`paperWidth${capitalizeFirstLetter(maxWidth)}`],
-            { [classes.fullScreen]: fullScreen },
+            {
+              [classes.fullScreen]: fullScreen,
+              [classes.fullWidth]: fullWidth,
+            },
           )}
         >
           {children}
@@ -221,6 +230,7 @@ Dialog.defaultProps = {
   enterTransitionDuration: duration.enteringScreen,
   leaveTransitionDuration: duration.leavingScreen,
   maxWidth: 'sm',
+  fullWidth: false,
   open: false,
   transition: Fade,
 };

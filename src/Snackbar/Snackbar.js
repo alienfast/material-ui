@@ -22,6 +22,11 @@ export const styles = (theme: Object) => {
   const bottomSpace = { bottom: gutter };
   const rightSpace = { right: gutter };
   const leftSpace = { left: gutter };
+  const center = {
+    left: '50%',
+    right: 'auto',
+    transform: 'translateX(-50%)',
+  };
 
   return {
     root: {
@@ -34,32 +39,36 @@ export const styles = (theme: Object) => {
       alignItems: 'center',
     },
     anchorTopCenter: {
-      extend: [top],
+      extend: [top, center],
     },
     anchorBottomCenter: {
-      extend: [bottom],
+      extend: [bottom, center],
     },
     anchorTopRight: {
       extend: [top, right],
       [theme.breakpoints.up('md')]: {
+        left: 'auto',
         extend: [topSpace, rightSpace],
       },
     },
     anchorBottomRight: {
       extend: [bottom, right],
       [theme.breakpoints.up('md')]: {
+        left: 'auto',
         extend: [bottomSpace, rightSpace],
       },
     },
     anchorTopLeft: {
       extend: [top, left],
       [theme.breakpoints.up('md')]: {
+        right: 'auto',
         extend: [topSpace, leftSpace],
       },
     },
     anchorBottomLeft: {
       extend: [bottom, left],
       [theme.breakpoints.up('md')]: {
+        right: 'auto',
         extend: [bottomSpace, leftSpace],
       },
     },
@@ -74,6 +83,7 @@ type Origin = {
 type DefaultProps = {
   anchorOrigin: Origin,
   autoHideDuration: ?number,
+  resumeHideDuration: ?number,
   classes: Object,
 };
 
@@ -91,6 +101,13 @@ export type Props = {
    * This behavior is disabled by default with the `null` value.
    */
   autoHideDuration?: number,
+  /**
+   * The number of milliseconds to wait before dismissing after user interaction.
+   * If `autoHideDuration` property isn't specified, it does nothing.
+   * If `autoHideDuration` property is specified but `resumeHideDuration` isn't,
+   * we default to `autoHideDuration / 2` ms.
+   */
+  resumeHideDuration?: number,
   /**
    * If you wish the take control over the children of the component you can use that property.
    * When using it, no `SnackbarContent` component will be rendered.
@@ -182,18 +199,15 @@ export type Props = {
   transition?: Element<*>,
 };
 
-type AllProps = DefaultProps & Props;
-
 type State = {
   exited: boolean,
 };
 
-class Snackbar extends React.Component<AllProps, State> {
-  props: AllProps;
-
+class Snackbar extends React.Component<DefaultProps & Props, State> {
   static defaultProps = {
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
     autoHideDuration: null,
+    resumeHideDuration: null,
     enterTransitionDuration: duration.enteringScreen,
     leaveTransitionDuration: duration.leavingScreen,
   };
@@ -283,6 +297,10 @@ class Snackbar extends React.Component<AllProps, State> {
   // or when the window is shown back.
   handleResume = () => {
     if (this.props.autoHideDuration !== null) {
+      if (this.props.resumeHideDuration !== null) {
+        this.setAutoHideTimer(this.props.resumeHideDuration);
+        return;
+      }
       this.setAutoHideTimer(this.props.autoHideDuration * 0.5);
     }
   };
@@ -296,6 +314,7 @@ class Snackbar extends React.Component<AllProps, State> {
       action,
       anchorOrigin: { vertical, horizontal },
       autoHideDuration,
+      resumeHideDuration,
       children,
       classes,
       className,

@@ -1,7 +1,7 @@
 // @flow weak
 
 import React from 'react';
-import type { ChildrenArray, ComponentType, Node } from 'react';
+import type { ChildrenArray, ElementType, Node } from 'react';
 import classNames from 'classnames';
 import EventListener from 'react-event-listener';
 import debounce from 'lodash/debounce';
@@ -59,17 +59,14 @@ export type Props = {
    * The component used for the root node.
    * Either a string to use a DOM element or a component.
    */
-  component?: string | ComponentType<*>,
+  component?: ElementType,
   /**
    * Height of the tile in number of grid cells.
    */
   rows?: number,
 };
 
-type AllProps = DefaultProps & Props;
-
-class GridListTile extends React.Component<AllProps> {
-  props: AllProps;
+class GridListTile extends React.Component<DefaultProps & Props> {
   static defaultProps = {
     cols: 1,
     rows: 1,

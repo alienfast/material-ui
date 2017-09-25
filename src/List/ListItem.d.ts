@@ -4,7 +4,7 @@ import { ButtonBaseProps } from '../ButtonBase';
 
 export type ListItemProps = {
   button?: boolean;
-  component?: React.ReactNode;
+  component?: React.ReactType;
   dense?: boolean;
   disabled?: boolean;
   disableGutters?: boolean;
@@ -12,4 +12,6 @@ export type ListItemProps = {
 } & ButtonBaseProps &
   React.LiHTMLAttributes<HTMLLIElement>;
 
-export default class ListItem extends StyledComponent<ListItemProps> {}
+declare const ListItem: StyledComponent<ListItemProps>;
+
+export default ListItem;

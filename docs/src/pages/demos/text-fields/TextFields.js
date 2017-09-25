@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { withStyles } from 'material-ui/styles';
+import MenuItem from 'material-ui/Menu/MenuItem';
 import TextField from 'material-ui/TextField';
 
 const styles = theme => ({
@@ -15,31 +16,55 @@ const styles = theme => ({
     marginRight: theme.spacing.unit,
     width: 200,
   },
+  menu: {
+    width: 200,
+  },
 });
+
+const currencies = [
+  {
+    value: 'USD',
+    label: '$',
+  },
+  {
+    value: 'EUR',
+    label: '€',
+  },
+  {
+    value: 'BTC',
+    label: '฿',
+  },
+  {
+    value: 'JPY',
+    label: '¥',
+  },
+];
 
 class TextFields extends React.Component {
   state = {
     name: 'Cat in the Hat',
+    age: '',
     multiline: 'Controlled',
+    currency: 'EUR',
   };
 
-  handleChangeMultiline = event => {
+  handleChange = name => event => {
     this.setState({
-      multiline: event.target.value,
+      [name]: event.target.value,
     });
   };
 
   render() {
-    const classes = this.props.classes;
+    const { classes } = this.props;
 
     return (
-      <form className={classes.container} noValidate>
+      <form className={classes.container} noValidate autoComplete="off">
         <TextField
           id="name"
           label="Name"
           className={classes.textField}
           value={this.state.name}
-          onChange={event => this.setState({ name: event.target.value })}
+          onChange={this.handleChange('name')}
           margin="normal"
         />
         <TextField
@@ -74,23 +99,12 @@ class TextFields extends React.Component {
           margin="normal"
         />
         <TextField
-          id="date"
-          label="From date"
-          type="date"
-          defaultValue="2017-05-24"
-          className={classes.textField}
-          margin="normal"
-          InputLabelProps={{
-            shrink: true,
-          }}
-        />
-        <TextField
           id="multiline-flexible"
           label="Multiline"
           multiline
           rowsMax="4"
           value={this.state.multiline}
-          onChange={this.handleChangeMultiline}
+          onChange={this.handleChange('multiline')}
           className={classes.textField}
           margin="normal"
         />
@@ -115,15 +129,79 @@ class TextFields extends React.Component {
           label="With placeholder"
           placeholder="Placeholder"
           className={classes.textField}
+          margin="normal"
         />
         <TextField
           label="With placeholder multiline"
           placeholder="Placeholder"
           multiline
           className={classes.textField}
+          margin="normal"
         />
         <TextField
-          id="placeholder"
+          id="number"
+          label="Number"
+          value={this.state.age}
+          onChange={this.handleChange('age')}
+          type="number"
+          className={classes.textField}
+          InputLabelProps={{
+            shrink: true,
+          }}
+          margin="normal"
+        />
+        <TextField
+          id="search"
+          label="Search field"
+          type="search"
+          className={classes.textField}
+          margin="normal"
+        />
+        <TextField
+          id="select-currency"
+          select
+          label="Select"
+          className={classes.textField}
+          value={this.state.currency}
+          onChange={this.handleChange('currency')}
+          SelectProps={{
+            MenuProps: {
+              className: classes.menu,
+            },
+          }}
+          helperText="Please select your currency"
+          margin="normal"
+        >
+          {currencies.map(option => (
+            <MenuItem key={option.value} value={option.value}>
+              {option.label}
+            </MenuItem>
+          ))}
+        </TextField>
+        <TextField
+          id="select-currency-native"
+          select
+          label="Native select"
+          className={classes.textField}
+          value={this.state.currency}
+          onChange={this.handleChange('currency')}
+          SelectProps={{
+            native: true,
+            MenuProps: {
+              className: classes.menu,
+            },
+          }}
+          helperText="Please select your currency"
+          margin="normal"
+        >
+          {currencies.map(option => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </TextField>
+        <TextField
+          id="full-width"
           label="Label"
           InputProps={{ placeholder: 'Placeholder' }}
           helperText="Full width!"

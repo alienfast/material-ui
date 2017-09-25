@@ -2,7 +2,7 @@
 // @inheritedComponent ListItem
 
 import React from 'react';
-import type { ComponentType, Node } from 'react';
+import type { ElementType, Node } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import ListItem from '../List/ListItem';
@@ -10,8 +10,8 @@ import ListItem from '../List/ListItem';
 export const styles = (theme: Object) => ({
   root: {
     ...theme.typography.subheading,
-    height: 48,
-    boxSizing: 'border-box',
+    height: 24,
+    boxSizing: 'content-box',
     background: 'none',
     overflow: 'hidden',
     textOverflow: 'ellipsis',
@@ -51,7 +51,7 @@ export type Props = {
    * The component used for the root node.
    * Either a string to use a DOM element or a component.
    */
-  component?: string | ComponentType<*>,
+  component?: ElementType,
   /**
    * @ignore
    */
@@ -62,9 +62,7 @@ export type Props = {
   selected?: boolean,
 };
 
-type AllProps = DefaultProps & Props;
-
-function MenuItem(props: AllProps) {
+function MenuItem(props: DefaultProps & Props) {
   const { classes, className: classNameProp, component, selected, role, ...other } = props;
 
   const className = classNames(
@@ -79,7 +77,7 @@ function MenuItem(props: AllProps) {
     <ListItem
       button
       role={role}
-      tabIndex="-1"
+      tabIndex={-1}
       className={className}
       component={component}
       {...other}

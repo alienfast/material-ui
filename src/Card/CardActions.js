@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import type { Node } from 'react';
+import type { ChildrenArray } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import { cloneChildrenWithClassName } from '../utils/reactHelpers';
@@ -27,7 +27,7 @@ export type Props = {
   /**
    * The content of the component.
    */
-  children?: Node,
+  children?: ChildrenArray<*>,
   /**
    * Useful to extend the style applied to components.
    */
@@ -42,18 +42,14 @@ export type Props = {
   disableActionSpacing?: boolean,
 };
 
-type AllProps = DefaultProps & Props;
-
-function CardActions(props: AllProps) {
+function CardActions(props: DefaultProps & Props) {
   const { disableActionSpacing, children, classes, className, ...other } = props;
 
   return (
     <div className={classNames(classes.root, className)} {...other}>
-      {disableActionSpacing ? (
-        children
-      ) : (
-        cloneChildrenWithClassName(children, classes.actionSpacing)
-      )}
+      {disableActionSpacing
+        ? children
+        : cloneChildrenWithClassName(children, classes.actionSpacing)}
     </div>
   );
 }

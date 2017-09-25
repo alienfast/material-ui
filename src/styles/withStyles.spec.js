@@ -3,7 +3,8 @@
 import React from 'react';
 import { spy } from 'sinon';
 import { assert } from 'chai';
-import { JssProvider, SheetsRegistry } from 'react-jss';
+import JssProvider from 'react-jss/lib/JssProvider';
+import { SheetsRegistry } from 'react-jss/lib/jss';
 import { create } from 'jss';
 import preset from 'jss-preset-default';
 import withStyles from './withStyles';
@@ -98,6 +99,14 @@ describe('withStyles', () => {
           consoleErrorMock.args()[1][0],
           /Material-UI: the key `root` provided to the classes property is not valid/,
         );
+      });
+
+      it('should recycle the object between two render if possible', () => {
+        const wrapper = mount(<StyledComponent1 />);
+        const classes1 = wrapper.find(Empty).props().classes;
+        wrapper.update();
+        const classes2 = wrapper.find(Empty).props().classes;
+        assert.strictEqual(classes1, classes2);
       });
     });
 

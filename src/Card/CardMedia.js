@@ -8,6 +8,7 @@ export const styles = {
   root: {
     backgroundSize: 'cover',
     backgroundRepeat: 'no-repeat',
+    backgroundPosition: 'center',
   },
 };
 
@@ -35,9 +36,7 @@ export type Props = {
   style?: Object,
 };
 
-type AllProps = DefaultProps & Props;
-
-function CardMedia(props: AllProps) {
+function CardMedia(props: DefaultProps & Props) {
   const { classes, className, image, style, ...other } = props;
   const composedStyle = { backgroundImage: `url(${image})`, ...style };
 

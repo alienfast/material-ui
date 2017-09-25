@@ -11,6 +11,7 @@ export const styles = (theme: Object) => ({
     display: 'inline-flex',
     width: 62,
     position: 'relative',
+    flexShrink: 0,
   },
   bar: {
     borderRadius: 7,
@@ -131,16 +132,14 @@ export type Props = {
   /**
    * @ignore
    */
-  tabIndex?: string,
+  tabIndex?: number | string,
   /**
    * The value of the component.
    */
   value?: string,
 };
 
-type AllProps = DefaultProps & Props;
-
-function Switch(props: AllProps) {
+function Switch(props: DefaultProps & Props) {
   const { classes, className, ...other } = props;
   const icon = <div className={classes.icon} />;
 

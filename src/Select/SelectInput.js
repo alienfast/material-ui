@@ -265,6 +265,9 @@ class SelectInput extends React.Component<AllProps, State> {
     }
 
     const items = React.Children.map(children, child => {
+      if (!React.isValidElement(child)) {
+        return null;
+      }
       let selected;
 
       if (multiple) {
@@ -308,8 +311,9 @@ class SelectInput extends React.Component<AllProps, State> {
             },
             classNameProp,
           )}
+          data-mui-test="SelectDisplay"
           aria-pressed={this.state.open ? 'true' : 'false'}
-          tabIndex={disabled ? null : '0'}
+          tabIndex={disabled ? null : 0}
           role="button"
           aria-owns={this.state.open ? `menu-${name || ''}` : null}
           aria-haspopup="true"

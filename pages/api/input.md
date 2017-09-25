@@ -20,13 +20,13 @@
 | inputComponent | union:&nbsp;string<br>&nbsp;ComponentType<*><br> |  | The component used for the input node. Either a string to use a DOM element or a component. It's an `input` by default. |
 | inputProps | Object |  | Properties applied to the `input` element. |
 | inputRef | Function |  | Use that property to pass a ref callback to the native input component. |
-| margin | literal |  | If `dense`, will adjust vertical spacing. This is normally obtained via context from FormControl. |
+| margin | union:&nbsp;'dense'<br>&nbsp;'none'<br> |  | If `dense`, will adjust vertical spacing. This is normally obtained via context from FormControl. |
 | multiline | boolean | false | If `true`, a textarea element will be rendered. |
 | name | string |  | Name attribute of the `input` element. |
-| onChange | Function |  | TODO |
-| onClean | Function |  | TODO |
-| onDirty | Function |  | TODO |
-| placeholder | string |  | TODO |
+| onChange | signature |  | Callback fired when the value is changed.<br><br>**Signature:**<br>`function(event: object) => void`<br>*event:* The event source of the callback |
+| onClean | signature |  | TODO |
+| onDirty | signature |  | TODO |
+| placeholder | string |  | The short hint displayed in the input before the user enters a value. |
 | rows | union:&nbsp;string<br>&nbsp;number<br> |  | Number of rows to display when multiline option is set to true. |
 | rowsMax | union:&nbsp;string<br>&nbsp;number<br> |  | Maximum number of rows to display when multiline option is set to true. |
 | type | string | 'text' | Type of the input element. It should be a valid HTML5 input type. |
@@ -36,7 +36,7 @@ Any other properties supplied will be [spread to the root element](/customizatio
 
 ## CSS API
 
-You can overrides all the class names injected by Material-UI thanks to the `classes` property.
+You can override all the class names injected by Material-UI thanks to the `classes` property.
 This property accepts the following keys:
 - `root`
 - `formControl`
@@ -50,6 +50,7 @@ This property accepts the following keys:
 - `multiline`
 - `inputDisabled`
 - `inputSingleline`
+- `inputSearch`
 - `inputMultiline`
 - `fullWidth`
 

@@ -33,7 +33,7 @@ class SimpleSelect extends React.Component {
     const classes = this.props.classes;
 
     return (
-      <div className={classes.container}>
+      <form className={classes.container} autoComplete="off">
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="age-simple">Age</InputLabel>
           <Select
@@ -101,7 +101,7 @@ class SimpleSelect extends React.Component {
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="name-input">Name</InputLabel>
           <Input id="name-input" />
-          <FormHelperText>Alignement with an input</FormHelperText>
+          <FormHelperText>Alignment with an input</FormHelperText>
         </FormControl>
         <FormControl className={classes.formControl}>
           <InputLabel htmlFor="name-readonly">Name</InputLabel>
@@ -119,7 +119,7 @@ class SimpleSelect extends React.Component {
           </Select>
           <FormHelperText>Read only</FormHelperText>
         </FormControl>
-      </div>
+      </form>
     );
   }
 }

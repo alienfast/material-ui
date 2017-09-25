@@ -6,7 +6,8 @@ export interface ChipProps extends React.HTMLAttributes<HTMLDivElement> {
   label?: React.ReactNode;
   onKeyDown?: React.EventHandler<React.KeyboardEvent<any>>;
   onRequestDelete?: React.EventHandler<any>;
-  tabIndex?: number;
 }
 
-export default class Chip extends StyledComponent<ChipProps> {}
+declare const Chip: StyledComponent<ChipProps>;
+
+export default Chip;

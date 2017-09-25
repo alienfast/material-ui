@@ -14,8 +14,10 @@ export interface SwitchProps extends SwitchBaseProps {
   inputProps?: object;
   name?: string;
   onChange?: (event: React.ChangeEvent<{}>, checked: boolean) => void;
-  tabIndex?: string;
+  tabIndex?: number;
   value?: string;
 }
 
-export default class Switch extends StyledComponent<SwitchProps> {}
+declare const Switch: StyledComponent<SwitchProps>;
+
+export default Switch;

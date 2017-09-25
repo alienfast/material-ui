@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import type { ChildrenArray, ComponentType, Node } from 'react';
+import type { ChildrenArray, ElementType, Node } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
@@ -59,7 +59,7 @@ export type Props = {
    * The component used for the root node.
    * Either a string to use a DOM element or a component.
    */
-  component?: string | ComponentType<*>,
+  component?: ElementType,
   /**
    * If `true`, the label, input and helper text should be displayed in a disabled state.
    */
@@ -90,8 +90,6 @@ export type Props = {
   margin?: 'none' | 'dense' | 'normal',
 };
 
-type AllProps = DefaultProps & Props;
-
 type State = {
   dirty: boolean,
   focused: boolean,
@@ -99,10 +97,15 @@ type State = {
 
 /**
  * Provides context such as dirty/focused/error/required for form inputs.
+ * Relying on the context provides high flexibilty and ensures that the state always stay
+ * consitent across the children of the `FormControl`.
+ * This context is used by the following components:
+ *  - FormLabel
+ *  - FormHelperText
+ *  - Input
+ *  - InputLabel
  */
-class FormControl extends React.Component<AllProps, State> {
-  props: AllProps;
-
+class FormControl extends React.Component<DefaultProps & Props, State> {
   static defaultProps = {
     component: 'div',
     disabled: false,

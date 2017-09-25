@@ -10,6 +10,9 @@ export interface FormControlProps
   onBlur?: React.EventHandler<any>;
   onFocus?: React.EventHandler<any>;
   required?: boolean;
+  component?: React.ReactType;
 }
 
-export default class FormControl extends StyledComponent<FormControlProps> {}
+declare const FormControl: StyledComponent<FormControlProps>;
+
+export default FormControl;

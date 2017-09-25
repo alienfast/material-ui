@@ -4,7 +4,7 @@ import { ButtonBaseProps } from '../ButtonBase';
 
 export interface ButtonProps extends ButtonBaseProps {
   color?: PropTypes.Color | 'contrast';
-  component?: React.ReactNode;
+  component?: React.ReactType;
   dense?: boolean;
   disabled?: boolean;
   disableFocusRipple?: boolean;
@@ -15,4 +15,6 @@ export interface ButtonProps extends ButtonBaseProps {
   type?: string;
 }
 
-export default class Button extends StyledComponent<ButtonProps> {}
+declare const Button: StyledComponent<ButtonProps>;
+
+export default Button
