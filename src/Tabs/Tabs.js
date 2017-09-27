@@ -1,17 +1,17 @@
 // @flow
 
 import React from 'react';
-import type { ChildrenArray, Node } from 'react';
+import type { Node } from 'react';
 import warning from 'warning';
 import classNames from 'classnames';
 import EventListener from 'react-event-listener';
 import debounce from 'lodash/debounce';
 import ScrollbarSize from 'react-scrollbar-size';
 import scroll from 'scroll';
-import pick from 'lodash/pick';
 import withStyles from '../styles/withStyles';
 import TabIndicator from './TabIndicator';
 import TabScrollButton from './TabScrollButton';
+import type { IndicatorStyle } from './TabIndicator';
 
 export const styles = (theme: Object) => ({
   root: {
@@ -45,6 +45,7 @@ export const styles = (theme: Object) => ({
 
 type DefaultProps = {
   classes: Object,
+  indicatorColor: string,
 };
 
 export type Props = {
@@ -60,7 +61,7 @@ export type Props = {
   /**
    * The content of the component.
    */
-  children?: $ReadOnlyArray<ChildrenArray<Node>>,
+  children?: Node,
   /**
    * Useful to extend the style applied to components.
    */
@@ -88,7 +89,7 @@ export type Props = {
    * @param {object} event The event source of the callback
    * @param {number} value We default to the index of the child
    */
-  onChange: Function,
+  onChange?: Function,
   /**
    * True invokes scrolling properties and allow for horizontally scrolling
    * (or swiping) the tab bar.
@@ -113,7 +114,7 @@ export type Props = {
 };
 
 type State = {
-  indicatorStyle: Object,
+  indicatorStyle: IndicatorStyle,
   scrollerStyle: Object,
   showLeftScroll: boolean,
   showRightScroll: boolean,
@@ -124,11 +125,7 @@ type TabsMeta = {
   scrollLeft: number,
   // ClientRect
   left: number,
-  width: number,
   right: number,
-  top: number,
-  bottom: number,
-  height: number,
 };
 
 /**
@@ -145,7 +142,10 @@ class Tabs extends React.Component<DefaultProps & Props, State> {
   };
 
   state = {
-    indicatorStyle: {},
+    indicatorStyle: {
+      left: 0,
+      width: 0,
+    },
     scrollerStyle: {
       marginBottom: 0,
     },
@@ -162,12 +162,11 @@ class Tabs extends React.Component<DefaultProps & Props, State> {
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.value !== this.props.value) {
-      this.updateIndicatorState(this.props);
-    }
     this.updateScrollButtonState();
     if (this.state.indicatorStyle !== prevState.indicatorStyle) {
       this.scrollSelectedIntoView();
+    } else {
+      this.updateIndicatorState(this.props);
     }
   }
 
@@ -254,17 +253,12 @@ class Tabs extends React.Component<DefaultProps & Props, State> {
   getTabsMeta = (value): { tabsMeta: ?TabsMeta, tabMeta: ?ClientRect } => {
     let tabsMeta;
     if (this.tabs) {
+      const rect = this.tabs.getBoundingClientRect();
       // create a new object with ClientRect class props + scrollLeft
       tabsMeta = {
-        scrollLeft: this.tabs.scrollLeft,
-        ...pick(this.tabs.getBoundingClientRect(), [
-          'left',
-          'width',
-          'right',
-          'top',
-          'bottom',
-          'height',
-        ]),
+        scrollLeft: this.tabs ? this.tabs.scrollLeft : 0,
+        left: rect.left,
+        right: rect.right,
       };
     }
 
