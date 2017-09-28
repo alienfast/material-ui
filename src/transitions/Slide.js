@@ -41,7 +41,7 @@ export type Props = {
   /**
    * A single child content element.
    */
-  children?: Element<*>,
+  children?: Element<any>,
   /**
    * Direction the child element will enter from.
    */
@@ -82,6 +82,10 @@ export type Props = {
    * Callback fired when the component has exited.
    */
   onExited?: TransitionCallback, // eslint-disable-line react/sort-prop-types
+  /**
+   * @ignore
+   */
+  theme: Object,
 };
 
 class Slide extends React.Component<DefaultProps & Props> {
