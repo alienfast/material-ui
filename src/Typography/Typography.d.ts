@@ -5,7 +5,7 @@ import { Style, TextStyle } from '../styles/createTypography';
 export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   align?: PropTypes.Alignment;
   component?: React.ReactType;
-  color?: PropTypes.Color | 'secondary';
+  color?: PropTypes.Color | 'secondary' | 'error';
   gutterBottom?: boolean;
   headlineMapping?: { [type in TextStyle]: string };
   noWrap?: boolean;
@@ -13,6 +13,31 @@ export interface TypographyProps extends React.HTMLAttributes<HTMLElement> {
   type?: Style | 'caption' | 'button';
 }
 
-declare const Typography: StyledComponent<TypographyProps>;
+export type TypographyClassKey =
+  | 'root'
+  | 'display4'
+  | 'display3'
+  | 'display2'
+  | 'display1'
+  | 'headline'
+  | 'title'
+  | 'subheading'
+  | 'body2'
+  | 'body1'
+  | 'caption'
+  | 'button'
+  | 'alignLeft'
+  | 'alignCenter'
+  | 'alignRight'
+  | 'alignJustify'
+  | 'noWrap'
+  | 'gutterBottom'
+  | 'paragraph'
+  | 'colorInherit'
+  | 'colorSecondary'
+  | 'colorAccent'
+  ;
+
+declare const Typography: StyledComponent<TypographyProps, TypographyClassKey>;
 
 export default Typography;

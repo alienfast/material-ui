@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StyledComponent } from '..';
-import { TransitionHandlers } from '../internal/Transition';
+import { TransitionDuration, TransitionHandlers } from '../internal/Transition';
 export type Origin = {
   horizontal?: 'left' | 'center' | 'right' | number;
   vertical?: 'top' | 'center' | 'bottom' | number;
@@ -11,8 +11,7 @@ export type SnackbarProps = {
   anchorOrigin?: Origin;
   autoHideDuration?: number;
   resumeHideDuration?: number;
-  enterTransitionDuration?: number;
-  leaveTransitionDuration?: number;
+  transitionDuration?: TransitionDuration;
   message?: React.ReactElement<any>;
   onMouseEnter?: React.MouseEventHandler<any>;
   onMouseLeave?: React.MouseEventHandler<any>;
@@ -23,6 +22,16 @@ export type SnackbarProps = {
 } & Partial<TransitionHandlers> &
   React.HTMLAttributes<HTMLDivElement>;
 
-declare const Snackbar: StyledComponent<SnackbarProps>;
+export type SnackbarClassKey =
+  | 'root'
+  | 'anchorTopCenter'
+  | 'anchorBottomCenter'
+  | 'anchorTopRight'
+  | 'anchorBottomRight'
+  | 'anchorTopLeft'
+  | 'anchorBottomLeft'
+  ;
+
+declare const Snackbar: StyledComponent<SnackbarProps, SnackbarClassKey>;
 
 export default Snackbar;

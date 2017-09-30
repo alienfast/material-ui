@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { StyledComponent } from '..';
 import { PaperProps } from '../Paper';
-import { TransitionHandlers } from '../internal/Transition';
+import { TransitionDuration, TransitionHandlers } from '../internal/Transition';
 import { ModalProps } from '../internal/Modal';
 
 export type Origin = {
@@ -23,12 +23,16 @@ export type PopoverProps = {
   open?: boolean;
   role?: string;
   transformOrigin?: Origin;
-  transitionDuration?: number | 'auto';
+  transitionDuration?: TransitionDuration;
   theme?: Object;
   PaperProps?: Partial<PaperProps>;
 } & Partial<TransitionHandlers> &
   ModalProps;
 
-declare const Popover: StyledComponent<PopoverProps>;
+export type PopoverClassKey =
+  | 'paper'
+  ;
+
+declare const Popover: StyledComponent<PopoverProps, PopoverClassKey>;
 
 export default Popover;
