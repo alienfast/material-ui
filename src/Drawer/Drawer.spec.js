@@ -4,6 +4,7 @@ import React from 'react';
 import { assert } from 'chai';
 import { createShallow, getClasses } from '../test-utils';
 import Slide from '../transitions/Slide';
+import createMuiTheme from '../styles/createMuiTheme';
 import Modal from '../internal/Modal';
 import Paper from '../Paper';
 import Drawer from './Drawer';
@@ -63,30 +64,30 @@ describe('<Drawer />', () => {
             <div />
           </Drawer>,
         );
-        assert.strictEqual(wrapper.find(Slide).props().transitionDuration, transitionDuration);
+        assert.strictEqual(wrapper.find(Slide).props().timeout, transitionDuration);
       });
 
-      it("should be passed to to Modal's backdropTransitionDuration when open=true", () => {
+      it("should be passed to to Modal's BackdropTransitionDuration when open=true", () => {
         const wrapper = shallow(
           <Drawer open transitionDuration={transitionDuration}>
             <div />
           </Drawer>,
         );
         assert.strictEqual(
-          wrapper.find(Modal).props().backdropTransitionDuration,
+          wrapper.find(Modal).props().BackdropTransitionDuration,
           transitionDuration,
         );
       });
     });
 
-    it("should override Modal's backdropTransitionDuration from property when specified", () => {
+    it("should override Modal's BackdropTransitionDuration from property when specified", () => {
       const testDuration = 335;
       const wrapper = shallow(
-        <Drawer backdropTransitionDuration={testDuration}>
+        <Drawer BackdropTransitionDuration={testDuration}>
           <div />
         </Drawer>,
       );
-      assert.strictEqual(wrapper.find(Modal).props().backdropTransitionDuration, testDuration);
+      assert.strictEqual(wrapper.find(Modal).props().BackdropTransitionDuration, testDuration);
     });
 
     it('should set the custom className for Modal when type is temporary', () => {
@@ -238,12 +239,14 @@ describe('<Drawer />', () => {
     let wrapper;
 
     before(() => {
+      const theme = createMuiTheme({
+        direction: 'rtl',
+      });
       wrapper = shallow(
-        <Drawer>
+        <Drawer theme={theme}>
           <div />
         </Drawer>,
       );
-      wrapper.instance().props.theme.dir = 'rtl';
     });
 
     it('should switch left and right anchor when theme is right-to-left', () => {

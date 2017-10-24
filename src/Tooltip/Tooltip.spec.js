@@ -6,6 +6,7 @@ import { spy, useFakeTimers } from 'sinon';
 import { Target, Popper } from 'react-popper';
 import { ShallowWrapper } from 'enzyme';
 import { createShallow, createMount, getClasses } from '../test-utils';
+import createMuiTheme from '../styles/createMuiTheme';
 import Tooltip from './Tooltip';
 
 function getChildren(wrapper) {
@@ -26,7 +27,11 @@ describe('<Tooltip />', () => {
   before(() => {
     shallow = createShallow({ dive: true });
     mount = createMount();
-    classes = getClasses(<Tooltip title="Hello World">Hello World</Tooltip>);
+    classes = getClasses(
+      <Tooltip title="Hello World">
+        <span>Hello World</span>
+      </Tooltip>,
+    );
   });
 
   after(() => {
@@ -34,14 +39,18 @@ describe('<Tooltip />', () => {
   });
 
   it('should render a Manager', () => {
-    const wrapper = shallow(<Tooltip title="Hello World">Hello World</Tooltip>);
+    const wrapper = shallow(
+      <Tooltip title="Hello World">
+        <span>Hello World</span>
+      </Tooltip>,
+    );
     assert.strictEqual(wrapper.name(), 'Manager');
   });
 
   it('should render with the user, root and tooltip classes', () => {
     const wrapper = shallow(
       <Tooltip className="woofTooltip" title="Hello World">
-        Hello World
+        <span>Hello World</span>
       </Tooltip>,
     );
     assert.strictEqual(wrapper.hasClass('woofTooltip'), true);
@@ -55,28 +64,66 @@ describe('<Tooltip />', () => {
     );
   });
 
-  it('should have top placement', () => {
-    const wrapper = shallow(
-      <Tooltip placement="top" title="Hello World">
-        Hello World
-      </Tooltip>,
-    );
-    assert.strictEqual(wrapper.hasClass(classes.root), true);
-    assert.strictEqual(
-      wrapper
-        .find(Popper)
-        .childAt(0)
-        .hasClass(classes.tooltip),
-      true,
-    );
-    wrapper.childAt(0).simulate('click');
-    assert.strictEqual(
-      wrapper
-        .find(Popper)
-        .childAt(0)
-        .hasClass(classes.tooltipTop),
-      true,
-    );
+  describe('prop: placement', () => {
+    it('should have top placement', () => {
+      const wrapper = shallow(
+        <Tooltip placement="top" title="Hello World">
+          <span>Hello World</span>
+        </Tooltip>,
+      );
+      assert.strictEqual(wrapper.hasClass(classes.root), true);
+      assert.strictEqual(
+        wrapper
+          .find(Popper)
+          .childAt(0)
+          .hasClass(classes.tooltip),
+        true,
+      );
+      wrapper.childAt(0).simulate('click');
+      assert.strictEqual(
+        wrapper
+          .find(Popper)
+          .childAt(0)
+          .hasClass(classes.tooltipTop),
+        true,
+      );
+    });
+
+    const theme = createMuiTheme({
+      direction: 'rtl',
+    });
+
+    [
+      {
+        in: 'bottom-end',
+        out: 'bottom-start',
+      },
+      {
+        in: 'bottom-start',
+        out: 'bottom-end',
+      },
+      {
+        in: 'top-end',
+        out: 'top-start',
+      },
+      {
+        in: 'top-start',
+        out: 'top-end',
+      },
+      {
+        in: 'top',
+        out: 'top',
+      },
+    ].forEach(test => {
+      it(`should flip ${test.in} when direction=rtl is used`, () => {
+        const wrapper = shallow(
+          <Tooltip theme={theme} placement={test.in} title="Hello World">
+            <span>Hello World</span>
+          </Tooltip>,
+        );
+        assert.strictEqual(wrapper.find(Popper).props().placement, test.out);
+      });
+    });
   });
 
   it('should call handleRequestClose & handleRequestOpen', () => {

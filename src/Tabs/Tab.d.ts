@@ -1,11 +1,16 @@
 import * as React from 'react';
-import { StyledComponent, Omit } from '..';
+import { StandardProps } from '..';
 import { ButtonBaseProps } from '../ButtonBase';
+import { ButtonBaseClassKey } from '../ButtonBase/ButtonBase';
 
-export type TabProps = {
+export interface TabProps extends StandardProps<
+  ButtonBaseProps,
+  TabClassKey,
+  'onChange'
+> {
   disabled?: boolean;
   fullWidth?: boolean;
-  icon?: React.ReactNode;
+  icon?: string | React.ReactElement<any>;
   value?: any;
   label?: React.ReactNode;
   onChange?: (
@@ -16,10 +21,10 @@ export type TabProps = {
   selected?: boolean;
   style?: object;
   textColor?: string | 'accent' | 'primary' | 'inherit';
-} & Partial<Omit<ButtonBaseProps, 'onChange'>>;
+}
 
 export type TabClassKey =
-  | 'root'
+  | ButtonBaseClassKey
   | 'rootLabelIcon'
   | 'rootAccent'
   | 'rootAccentSelected'
@@ -37,6 +42,6 @@ export type TabClassKey =
   | 'labelWrapped'
   ;
 
-declare const Tab: StyledComponent<TabProps, TabClassKey>;
+declare const Tab: React.ComponentType<TabProps>;
 
 export default Tab;

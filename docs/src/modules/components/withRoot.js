@@ -41,6 +41,9 @@ const pages = [
       {
         pathname: '/getting-started/supported-platforms',
       },
+      {
+        pathname: '/getting-started/frequently-asked-questions',
+      },
     ],
   },
   {
@@ -86,6 +89,9 @@ const pages = [
       },
       {
         pathname: '/guides/flow',
+      },
+      {
+        pathname: '/guides/typescript',
       },
     ],
   },
@@ -186,6 +192,7 @@ function withRoot(BaseComponent) {
 
   type WithRootProps = {
     reduxServerState?: Object,
+    sheetsRegistry?: Object,
     url: Object,
   };
   class WithRoot extends React.Component<WithRootProps> {
@@ -237,10 +244,12 @@ function withRoot(BaseComponent) {
     redux = null;
 
     render() {
+      const { sheetsRegistry, ...other } = this.props;
+
       return (
         <Provider store={this.redux}>
-          <AppWrapper>
-            <PureBaseComponent initialProps={this.props} />
+          <AppWrapper sheetsRegistry={sheetsRegistry}>
+            <PureBaseComponent initialProps={other} />
           </AppWrapper>
         </Provider>
       );

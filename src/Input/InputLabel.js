@@ -9,7 +9,7 @@ import { FormLabel } from '../Form';
 
 export const styles = (theme: Object) => ({
   root: {
-    transformOrigin: 'top left',
+    transformOrigin: `top ${theme.direction === 'ltr' ? 'left' : 'right'}`,
   },
   formControl: {
     position: 'absolute',
@@ -24,7 +24,7 @@ export const styles = (theme: Object) => ({
   },
   shrink: {
     transform: 'translate(0, 1.5px) scale(0.75)',
-    transformOrigin: 'top left',
+    transformOrigin: `top ${theme.direction === 'ltr' ? 'left' : 'right'}`,
   },
   animated: {
     transition: theme.transitions.create('transform', {
@@ -108,7 +108,7 @@ function InputLabel(props: ProvidedProps & Props, context: { muiFormControl: Obj
   let shrink = shrinkProp;
 
   if (typeof shrink === 'undefined' && muiFormControl) {
-    shrink = muiFormControl.dirty || muiFormControl.focused;
+    shrink = muiFormControl.dirty || muiFormControl.focused || muiFormControl.adorned;
   }
 
   let margin = marginProp;
@@ -129,7 +129,7 @@ function InputLabel(props: ProvidedProps & Props, context: { muiFormControl: Obj
   );
 
   return (
-    <FormLabel className={className} classes={FormControlClasses} {...other}>
+    <FormLabel data-shrink={shrink} className={className} classes={FormControlClasses} {...other}>
       {children}
     </FormLabel>
   );

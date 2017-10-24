@@ -13,7 +13,7 @@ import grey from '../colors/grey';
 import withStyles from '../styles/withStyles';
 
 // Use a class component so we can get a reference.
-class TargetChildren extends React.Component<{ element: string | Element<any> }> {
+class TargetChildren extends React.Component<{ element: Element<any> }> {
   render() {
     return this.props.element;
   }
@@ -22,6 +22,7 @@ class TargetChildren extends React.Component<{ element: string | Element<any> }>
 export const styles = (theme: Object) => ({
   root: {
     display: 'inline',
+    flexDirection: 'inherit', // Makes the wrapper more transparent.
   },
   popper: {
     zIndex: theme.zIndex.tooltip,
@@ -98,6 +99,21 @@ export type Placement =
   | 'top-start'
   | 'top';
 
+function flipPlacement(placement: Placement): Placement {
+  switch (placement) {
+    case 'bottom-end':
+      return 'bottom-start';
+    case 'bottom-start':
+      return 'bottom-end';
+    case 'top-end':
+      return 'top-start';
+    case 'top-start':
+      return 'top-end';
+    default:
+      return placement;
+  }
+}
+
 type ProvidedProps = {
   classes: Object,
   disableTriggerFocus: boolean,
@@ -106,13 +122,14 @@ type ProvidedProps = {
   enterDelay: number,
   leaveDelay: number,
   placement: Placement,
+  theme: Object,
 };
 
 export type Props = {
   /**
    * Tooltip reference component.
    */
-  children: string | Element<any>,
+  children: Element<any>,
   /**
    * Useful to extend the style applied to components.
    */
@@ -174,6 +191,10 @@ export type Props = {
    * Properties applied to the `Popper` element.
    */
   PopperProps?: Object,
+  /**
+   * @ignore
+   */
+  theme?: Object,
 };
 
 type State = {
@@ -340,12 +361,14 @@ class Tooltip extends React.Component<ProvidedProps & Props, State> {
       open: openProp,
       onRequestClose,
       onRequestOpen,
+      theme,
       title,
-      placement,
+      placement: rawPlacement,
       PopperProps: { PopperClassName, ...PopperOther } = {},
       ...other
     } = this.props;
 
+    const placement = theme.direction === 'rtl' ? flipPlacement(rawPlacement) : rawPlacement;
     const open = this.isControlled ? openProp : this.state.open;
     const childrenProps = {};
 
@@ -416,4 +439,4 @@ class Tooltip extends React.Component<ProvidedProps & Props, State> {
   }
 }
 
-export default withStyles(styles, { name: 'MuiTooltip' })(Tooltip);
+export default withStyles(styles, { name: 'MuiTooltip', withTheme: true })(Tooltip);

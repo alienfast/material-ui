@@ -3,7 +3,7 @@
 import React from 'react';
 import { assert } from 'chai';
 import { spy } from 'sinon';
-import { createShallow, createMount, getClasses } from '../test-utils';
+import { createShallow, createMount, getClasses, unwrap } from '../test-utils';
 import createSwitch from './SwitchBase';
 import Icon from '../Icon';
 
@@ -17,7 +17,7 @@ function assertIsChecked(wrapper) {
   );
 
   const input = wrapper.find('input');
-  assert.strictEqual(input.getNode().checked, true, 'the DOM node should be checked');
+  assert.strictEqual(input.instance().checked, true, 'the DOM node should be checked');
 
   const label = iconButton.childAt(0);
   const icon = label.childAt(0);
@@ -34,7 +34,7 @@ function assertIsNotChecked(wrapper) {
   );
 
   const input = wrapper.find('input');
-  assert.strictEqual(input.getNode().checked, false, 'the DOM node should not be checked');
+  assert.strictEqual(input.instance().checked, false, 'the DOM node should not be checked');
 
   const label = iconButton.childAt(0);
   const icon = label.childAt(0);
@@ -50,9 +50,11 @@ describe('<SwitchBase />', () => {
   let mount;
   let classes;
   let SwitchBase;
+  let SwitchBaseNaked;
 
   before(() => {
     SwitchBase = createSwitch();
+    SwitchBaseNaked = unwrap(SwitchBase);
     shallow = createShallow({ dive: true });
     mount = createMount();
     classes = getClasses(<SwitchBase />);
@@ -155,8 +157,7 @@ describe('<SwitchBase />', () => {
 
     beforeEach(() => {
       wrapper = mount(
-        // $FlowFixMe - HOC is hoisting of static Naked, not sure how to represent that
-        <SwitchBase.Naked
+        <SwitchBaseNaked
           classes={{}}
           className="test-class"
           checkedClassName="test-class-checked"
@@ -191,8 +192,7 @@ describe('<SwitchBase />', () => {
 
     beforeEach(() => {
       wrapper = mount(
-        // $FlowFixMe - HOC is hoisting of static Naked, not sure how to represent that
-        <SwitchBase.Naked
+        <SwitchBaseNaked
           classes={{}}
           className="test-class"
           checkedClassName="test-class-checked"
@@ -208,20 +208,22 @@ describe('<SwitchBase />', () => {
     it('should check the checkbox', () => {
       wrapper
         .find('input')
-        .getNode()
+        .instance()
         .click();
+      wrapper.update();
       assertIsChecked(wrapper);
     });
 
     it('should uncheck the checkbox', () => {
       wrapper
         .find('input')
-        .getNode()
+        .instance()
         .click();
       wrapper
         .find('input')
-        .getNode()
+        .instance()
         .click();
+      wrapper.update();
       assertIsNotChecked(wrapper);
     });
   });
@@ -240,10 +242,13 @@ describe('<SwitchBase />', () => {
     let onChangeSpy;
 
     before(() => {
-      event = 'woofSwitchBase';
+      event = {
+        target: {
+          checked: false,
+        },
+      };
       onChangeSpy = spy();
-      // $FlowFixMe - HOC is hoisting of static Naked, not sure how to represent that
-      wrapper = mount(<SwitchBase.Naked classes={{}} />);
+      wrapper = mount(<SwitchBaseNaked classes={{}} />);
       wrapper.setProps({ onChange: onChangeSpy });
       instance = wrapper.instance();
     });
@@ -274,10 +279,11 @@ describe('<SwitchBase />', () => {
 
       it('should call onChange once', () => {
         assert.strictEqual(onChangeSpy.callCount, 1);
-      });
-
-      it('should call onChange with event and !props.checked', () => {
-        assert.strictEqual(onChangeSpy.calledWith(event, !checked), true);
+        assert.strictEqual(
+          onChangeSpy.calledWith(event, !checked),
+          true,
+          'call onChange with event and !props.checked',
+        );
       });
     });
 

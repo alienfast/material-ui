@@ -10,7 +10,7 @@ import ClickAwayListener from '../internal/ClickAwayListener';
 import { capitalizeFirstLetter, createChainedFunction } from '../utils/helpers';
 import Slide from '../transitions/Slide';
 import SnackbarContent from './SnackbarContent';
-import type { TransitionDuration, TransitionCallback } from '../internal/Transition';
+import type { TransitionDuration, TransitionCallback } from '../internal/transition';
 
 export const styles = (theme: Object) => {
   const gutter = theme.spacing.unit * 3;
@@ -39,10 +39,16 @@ export const styles = (theme: Object) => {
       alignItems: 'center',
     },
     anchorTopCenter: {
-      extend: [top, center],
+      extend: [top],
+      [theme.breakpoints.up('md')]: {
+        extend: [center],
+      },
     },
     anchorBottomCenter: {
-      extend: [bottom, center],
+      extend: [bottom],
+      [theme.breakpoints.up('md')]: {
+        extend: [center],
+      },
     },
     anchorTopRight: {
       extend: [top, right],
@@ -336,8 +342,8 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
 
     const transitionProps = {
       in: open,
-      transitionAppear: true,
-      transitionDuration,
+      appear: true,
+      timeout: transitionDuration,
       onEnter,
       onEntering,
       onEntered,
@@ -355,6 +361,7 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
     } else {
       // $FlowFixMe - rosskevin - figure this out later
       transition = React.cloneElement(
+        // $FlowFixMe - flow isn't smart enough to handle this pattern
         transitionProp || <Slide direction={vertical === 'top' ? 'down' : 'up'} />,
         transitionProps,
         transitionContent,
@@ -384,4 +391,4 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
   }
 }
 
-export default withStyles(styles, { name: 'MuiSnackbar' })(Snackbar);
+export default withStyles(styles, { flip: false, name: 'MuiSnackbar' })(Snackbar);

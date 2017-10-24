@@ -20,7 +20,7 @@ export const styles = (theme: Object) => ({
     // When interacting quickly, the text can end up selected.
     // Native select can't be selected either.
     userSelect: 'none',
-    padding: `0 ${theme.spacing.unit * 4}px 0 0`,
+    padding: `0 ${theme.spacing.unit * 4}px 2px 0`,
     width: `calc(100% - ${theme.spacing.unit * 4}px)`,
     minWidth: theme.spacing.unit * 2, // So it doesn't collapse.
     height: `calc(1em + ${theme.spacing.unit * 2 - 2}px)`,
@@ -57,6 +57,7 @@ export const styles = (theme: Object) => ({
 
 type ProvidedProps = {
   classes: Object,
+  displayEmpty: boolean,
   input: Element<any>,
   native: boolean,
   multiple: boolean,
@@ -78,6 +79,11 @@ export type Props = {
    */
   classes?: Object,
   /**
+   * If `true`, the selected item is displayed even if its value is empty.
+   * You can only use it when the `native` property is `false` (default).
+   */
+  displayEmpty?: boolean,
+  /**
    * An `Input` element; does not have to be a material-ui specific `Input`.
    */
   input?: Element<any>,
@@ -87,6 +93,7 @@ export type Props = {
   native?: boolean,
   /**
    * If true, `value` must be an array and the menu will support multiple selections.
+   * You can only use it when the `native` property is `false` (default).
    */
   multiple?: boolean,
   /**
@@ -95,7 +102,7 @@ export type Props = {
   MenuProps?: Object,
   /**
    * Render the selected value.
-   * It's only useful when the `native` property is not set to `true`.
+   * You can only use it when the `native` property is `false` (default).
    */
   renderValue?: Function,
   /**
@@ -109,6 +116,7 @@ function Select(props: ProvidedProps & Props) {
     autoWidth,
     children,
     classes,
+    displayEmpty,
     input,
     native,
     multiple,
@@ -136,6 +144,7 @@ function Select(props: ProvidedProps & Props) {
       autoWidth,
       children,
       classes,
+      displayEmpty,
       native,
       multiple,
       MenuProps,
@@ -146,6 +155,7 @@ function Select(props: ProvidedProps & Props) {
 
 Select.defaultProps = {
   autoWidth: false,
+  displayEmpty: false,
   input: <Input />,
   native: false,
   multiple: false,

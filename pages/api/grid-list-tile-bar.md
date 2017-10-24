@@ -1,3 +1,7 @@
+---
+filename: /src/GridList/GridListTileBar.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # GridListTileBar
@@ -5,13 +9,14 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
-| actionIcon | Element |  | An IconButton element to be used as secondary action target (primary action target is the tile itself). |
+| actionIcon | Node |  | An IconButton element to be used as secondary action target (primary action target is the tile itself). |
 | actionPosition | union:&nbsp;'left'<br>&nbsp;'right'<br> | 'right' | Position of secondary action IconButton. |
 | classes | Object |  | Useful to extend the style applied to components. |
-| subtitle | union:&nbsp;string<br>&nbsp;Element<any><br> |  | String or element serving as subtitle (support text). |
-| <span style="color: #31a148">title *</span> | union:&nbsp;string<br>&nbsp;Element<any><br> |  | Title to be displayed on tile. |
+| subtitle | Node |  | String or element serving as subtitle (support text). |
+| <span style="color: #31a148">title *</span> | Node |  | Title to be displayed on tile. |
 | titlePosition | union:&nbsp;'top'<br>&nbsp;'bottom'<br> | 'bottom' | Position of the title bar. |
 
 Any other properties supplied will be [spread to the root element](/customization/api#spread).
@@ -32,8 +37,9 @@ This property accepts the following keys:
 - `actionIconPositionLeft`
 - `childImg`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/GridList/GridListTileBar.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

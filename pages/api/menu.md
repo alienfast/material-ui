@@ -1,3 +1,7 @@
+---
+filename: /src/Menu/Menu.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # Menu
@@ -5,6 +9,7 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | MenuListProps | Object |  | Properties applied to the `MenuList` element. |
@@ -19,7 +24,7 @@
 | onExiting | TransitionCallback |  | Callback fired when the Menu is exiting. |
 | onRequestClose | Function |  | Callback fired when the component requests to be closed.<br><br>**Signature:**<br>`function(event: object) => void`<br>*event:* The event source of the callback |
 | open | boolean | false | If `true`, the menu is visible. |
-| transitionDuration | union:&nbsp;number<br>&nbsp;'auto'<br> | 'auto' | The length of the transition in `ms`, or 'auto' |
+| transitionDuration | union:&nbsp;number<br>&nbsp;{ enter?: number, exit?: number }<br>&nbsp;'auto'<br> | 'auto' | The length of the transition in `ms`, or 'auto' |
 
 Any other properties supplied will be [spread to the root element](/customization/api#spread).
 
@@ -29,8 +34,9 @@ You can override all the class names injected by Material-UI thanks to the `clas
 This property accepts the following keys:
 - `root`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/Menu/Menu.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

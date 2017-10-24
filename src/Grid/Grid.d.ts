@@ -1,9 +1,11 @@
 import * as React from 'react';
-import { Omit, StyledComponent, StyledComponentProps } from '..';
+import { StandardProps } from '..';
 import { HiddenProps } from '../Hidden/Hidden';
 import { Breakpoint } from '../styles/createBreakpoints';
 
-export type GridAlignment = 'flex-start' | 'center' | 'flex-end' | 'stretch';
+export type GridItemsAlignment = 'flex-start' | 'center' | 'flex-end' | 'stretch' | 'baseline';
+
+export type GridContentAlignment = 'stretch' | 'center' | 'flex-start' | 'flex-end' |'space-between' | 'space-around';
 
 export type GridDirection = 'row' | 'row-reverse' | 'column' | 'column-reverse';
 
@@ -20,18 +22,22 @@ export type GridWrap = 'nowrap' | 'wrap' | 'wrap-reverse';
 
 export type GridSize = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12;
 
-export type GridProps = {
+export interface GridProps extends StandardProps<
+  React.HTMLAttributes<HTMLElement> & Partial<Record<Breakpoint, boolean | GridSize>>,
+  GridClassKey,
+  'hidden'
+> {
   component?: React.ReactType;
   container?: boolean;
   item?: boolean;
-  align?: GridAlignment;
+  alignItems?: GridItemsAlignment;
+  alignContent?: GridContentAlignment;
   direction?: GridDirection;
   spacing?: GridSpacing;
-  hidden?: HiddenProps & StyledComponentProps<any>;
+  hidden?: HiddenProps;
   justify?: GridJustification;
   wrap?: GridWrap;
-} & Partial<{ [key in Breakpoint]: boolean | GridSize }>
-  & Partial<Omit<React.HTMLAttributes<HTMLElement>, 'hidden'>>;
+}
 
 export type GridClassKey =
   | 'typeContainer'
@@ -40,10 +46,15 @@ export type GridClassKey =
   | 'direction-xs-column-reverse'
   | 'direction-xs-row-reverse'
   | 'wrap-xs-nowrap'
-  | 'align-xs-center'
-  | 'align-xs-flex-start'
-  | 'align-xs-flex-end'
-  | 'align-xs-baseline'
+  | 'align-items-xs-center'
+  | 'align-items-xs-flex-start'
+  | 'align-items-xs-flex-end'
+  | 'align-items-xs-baseline'
+  | 'align-content-xs-center'
+  | 'align-content-xs-flex-start'
+  | 'align-content-xs-flex-end'
+  | 'align-content-xs-space-between'
+  | 'align-content-xs-space-around'
   | 'justify-xs-center'
   | 'justify-xs-flex-end'
   | 'justify-xs-space-between'
@@ -67,6 +78,6 @@ export type GridClassKey =
   | 'grid-xs-12'
   ;
 
-declare const Grid: StyledComponent<GridProps, GridClassKey>;
+declare const Grid: React.ComponentType<GridProps>;
 
 export default Grid;

@@ -11,7 +11,7 @@ import AppContent from 'docs/src/modules/components/AppContent';
 import MarkdownElement from 'docs/src/modules/components/MarkdownElement';
 import Demo from 'docs/src/modules/components/Demo';
 import Carbon from 'docs/src/modules/components/Carbon';
-import { getComponents, getContents, getTitle } from 'docs/src/modules/utils/parseMarkdown';
+import { getHeaders, getContents, getTitle } from 'docs/src/modules/utils/parseMarkdown';
 
 const styles = {
   root: {
@@ -39,7 +39,7 @@ type Props = {
 function MarkdownDocs(props: Props, context: Object) {
   const { classes, demos, markdown, sourceLocation: sourceLocationProp } = props;
   const contents = getContents(markdown);
-  const components = getComponents(markdown);
+  const headers = getHeaders(markdown);
 
   let sourceLocation = sourceLocationProp || context.activePage.pathname;
 
@@ -51,8 +51,8 @@ function MarkdownDocs(props: Props, context: Object) {
       sourceLocation = token.join('/');
     }
 
-    if (sourceLocation.indexOf('/api') === 0) {
-      sourceLocation = `/pages/${sourceLocation}.md`;
+    if (headers.filename) {
+      sourceLocation = headers.filename;
     } else {
       sourceLocation = `/docs/src/pages${sourceLocation}.md`;
     }
@@ -75,17 +75,17 @@ function MarkdownDocs(props: Props, context: Object) {
         if (match && demos) {
           const name = match[1];
           warning(demos && demos[name], `Missing demo: ${name}.`);
-          return <Demo key={content} name={name} js={demos[name].js} raw={demos[name].raw} />;
+          return <Demo key={content} js={demos[name].js} raw={demos[name].raw} />;
         }
 
         return <MarkdownElement key={content} text={content} />;
       })}
-      {components.length > 0 ? (
+      {headers.components.length > 0 ? (
         <MarkdownElement
           text={`
 ## API
 
-${components
+${headers.components
             .map(component => `- [&lt;${component} /&gt;](/api/${kebabCase(component)})`)
             .join('\n')}
           `}

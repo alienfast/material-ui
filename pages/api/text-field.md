@@ -1,3 +1,7 @@
+---
+filename: /src/TextField/TextField.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # TextField
@@ -5,6 +9,7 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | FormHelperTextProps | Object |  | Properties applied to the `FormHelperText` element. |
@@ -40,7 +45,6 @@
 | value | union:&nbsp;string<br>&nbsp;number<br> |  | The value of the `Input` element, required for a controlled component. |
 
 Any other properties supplied will be [spread to the root element](/customization/api#spread).
-
 
 ## Inheritance
 

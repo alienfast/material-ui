@@ -3,14 +3,13 @@
 import React from 'react';
 import type { Node } from 'react';
 import ReactDOM from 'react-dom';
-import classNames from 'classnames';
 import warning from 'warning';
 import contains from 'dom-helpers/query/contains';
 import debounce from 'lodash/debounce';
 import EventListener from 'react-event-listener';
 import withStyles from '../styles/withStyles';
 import Modal from '../internal/Modal';
-import type { TransitionCallback } from '../internal/Transition';
+import type { TransitionCallback, TransitionClasses } from '../internal/transition';
 import Grow from '../transitions/Grow';
 import Paper from '../Paper';
 
@@ -82,6 +81,7 @@ type ProvidedProps = {
   anchorOrigin: Origin,
   classes: Object,
   transformOrigin: Origin,
+  marginThreshold: number,
 };
 
 export type Props = {
@@ -108,67 +108,51 @@ export type Props = {
    */
   classes?: Object,
   /**
-   * @ignore
-   */
-  className?: string,
-  /**
    * The elevation of the popover.
    */
   elevation?: number,
-  /**
-   * The CSS class name applied while the component is entering
-   */
-  enteredClassName?: string,
-  /**
-   * The CSS class name applied while the component is entering
-   */
-  enteringClassName?: string,
-  /**
-   * The CSS class name applied when the component is exited
-   */
-  exitedClassName?: string,
-  /**
-   * The CSS class name applied while the component is exiting
-   */
-  exitingClassName?: string,
   /**
    * @ignore
    */
   getContentAnchorEl?: Function,
   /**
-   * Callback fired before the component is entering
+   * Specifies how close to the edge of the window the popover can appear.
+   */
+  marginThreshold?: number,
+  /**
+   * Callback fired before the component is entering.
    */
   onEnter?: TransitionCallback,
   /**
-   * Callback fired when the component is entering
+   * Callback fired when the component is entering.
    */
   onEntering?: TransitionCallback,
   /**
-   * Callback fired when the component has entered
+   * Callback fired when the component has entered.
    */
   onEntered?: TransitionCallback,
   /**
-   * Callback fired before the component is exiting
+   * Callback fired before the component is exiting.
    */
   onExit?: TransitionCallback,
   /**
-   * Callback fired when the component is exiting
+   * Callback fired when the component is exiting.
    */
   onExiting?: TransitionCallback,
   /**
-   * Callback fired when the component has exited
+   * Callback fired when the component has exited.
    */
   onExited?: TransitionCallback,
   /**
    * Callback fired when the component requests to be closed.
    *
-   * @param {object} event The event source of the callback
+   * @param {object} event The event source of the callback.
    */
   onRequestClose?: Function,
   /**
    * If `true`, the popover is visible.
    */
-  open?: boolean,
+  open: boolean,
   /**
    * Properties applied to the `Paper` element.
    */
@@ -187,9 +171,14 @@ export type Props = {
    */
   transformOrigin?: Origin,
   /**
-   * Set to 'auto' to automatically calculate transition time based on height
+   * The animation classNames applied to the component as it enters or exits.
+   * This property is a direct binding to [`CSSTransition.classNames`](https://reactcommunity.org/react-transition-group/#CSSTransition-prop-classNames).
    */
-  transitionDuration?: number | 'auto',
+  transitionClasses?: TransitionClasses,
+  /**
+   * Set to 'auto' to automatically calculate transition time based on height.
+   */
+  transitionDuration?: number | { enter?: number, exit?: number } | 'auto',
 };
 
 class Popover extends React.Component<ProvidedProps & Props> {
@@ -198,13 +187,13 @@ class Popover extends React.Component<ProvidedProps & Props> {
       vertical: 'top',
       horizontal: 'left',
     },
-    open: false,
     transformOrigin: {
       vertical: 'top',
       horizontal: 'left',
     },
     transitionDuration: 'auto',
     elevation: 8,
+    marginThreshold: 16,
   };
 
   componentWillUnmount = () => {
@@ -236,9 +225,9 @@ class Popover extends React.Component<ProvidedProps & Props> {
     this.setPositioningStyles(element);
   }, 166);
 
-  marginThreshold = 16;
+  getPositioningStyle = element => {
+    const { marginThreshold } = this.props;
 
-  getPositioningStyle(element) {
     // Check if the parent has requested anchoring on an inner content node
     const contentAnchorOffset = this.getContentAnchorOffset(element);
     // Get the offset of of the anchoring element
@@ -258,12 +247,12 @@ class Popover extends React.Component<ProvidedProps & Props> {
     const right = left + elemRect.width;
 
     // Window thresholds taking required margin into account
-    const heightThreshold = window.innerHeight - this.marginThreshold;
-    const widthThreshold = window.innerWidth - this.marginThreshold;
+    const heightThreshold = window.innerHeight - marginThreshold;
+    const widthThreshold = window.innerWidth - marginThreshold;
 
     // Check if the vertical axis needs shifting
-    if (top < this.marginThreshold) {
-      const diff = top - this.marginThreshold;
+    if (top < marginThreshold) {
+      const diff = top - marginThreshold;
       top -= diff;
       transformOrigin.vertical += diff;
     } else if (bottom > heightThreshold) {
@@ -273,8 +262,8 @@ class Popover extends React.Component<ProvidedProps & Props> {
     }
 
     // Check if the horizontal axis needs shifting
-    if (left < this.marginThreshold) {
-      const diff = left - this.marginThreshold;
+    if (left < marginThreshold) {
+      const diff = left - marginThreshold;
       left -= diff;
       transformOrigin.horizontal += diff;
     } else if (right > widthThreshold) {
@@ -288,7 +277,7 @@ class Popover extends React.Component<ProvidedProps & Props> {
       left: `${left}px`,
       transformOrigin: getTransformOriginValue(transformOrigin),
     };
-  }
+  };
 
   handleGetOffsetTop = getOffsetTop;
   handleGetOffsetLeft = getOffsetLeft;
@@ -325,7 +314,7 @@ class Popover extends React.Component<ProvidedProps & Props> {
       warning(
         this.props.anchorOrigin.vertical === 'top',
         [
-          'Material-UI: you can change the `anchorOrigin.vertical` value when also ',
+          'Material-UI: you can not change the `anchorOrigin.vertical` value when also ',
           'providing the `getContentAnchorEl` property. Pick one.',
         ].join(),
       );
@@ -350,13 +339,9 @@ class Popover extends React.Component<ProvidedProps & Props> {
       anchorOrigin,
       children,
       classes,
-      className,
       elevation,
-      enteredClassName,
-      enteringClassName,
-      exitedClassName,
-      exitingClassName,
       getContentAnchorEl,
+      marginThreshold,
       onEnter,
       onEntering,
       onEntered,
@@ -367,18 +352,16 @@ class Popover extends React.Component<ProvidedProps & Props> {
       PaperProps,
       role,
       transformOrigin,
+      transitionClasses,
       transitionDuration,
       ...other
     } = this.props;
 
     return (
-      <Modal show={open} backdropInvisible {...other}>
+      <Modal show={open} BackdropInvisible {...other}>
         <Grow
+          appear
           in={open}
-          enteredClassName={enteredClassName}
-          enteringClassName={enteringClassName}
-          exitedClassName={exitedClassName}
-          exitingClassName={exitingClassName}
           onEnter={this.handleEnter}
           onEntering={onEntering}
           onEntered={onEntered}
@@ -386,15 +369,15 @@ class Popover extends React.Component<ProvidedProps & Props> {
           onExiting={onExiting}
           onExited={onExited}
           role={role}
-          transitionAppear
-          transitionDuration={transitionDuration}
+          transitionClasses={transitionClasses}
+          timeout={transitionDuration}
           rootRef={node => {
             this.transitionEl = node;
           }}
         >
           <Paper
             data-mui-test="Popover"
-            className={classNames(classes.paper, className)}
+            className={classes.paper}
             elevation={elevation}
             {...PaperProps}
           >

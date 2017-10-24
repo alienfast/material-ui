@@ -4,7 +4,8 @@ import React from 'react';
 import keycode from 'keycode';
 import { assert } from 'chai';
 import { spy } from 'sinon';
-import { createShallow, createMount, getClasses } from '../test-utils';
+import CheckBox from '../svg-icons/CheckBox';
+import { createShallow, createMount, getClasses, unwrap } from '../test-utils';
 import Avatar from '../Avatar';
 import Chip from './Chip';
 
@@ -113,13 +114,13 @@ describe('<Chip />', () => {
     it('should merge user classes & spread custom props to the root node', () => {
       assert.strictEqual(wrapper.hasClass(classes.root), true);
       assert.strictEqual(wrapper.hasClass('my-Chip'), true);
-      assert.strictEqual(wrapper.prop('data-my-prop'), 'woofChip');
+      assert.strictEqual(wrapper.props()['data-my-prop'], 'woofChip');
     });
 
     it('should merge user classes & spread custom props to the Avatar node', () => {
       assert.strictEqual(wrapper.childAt(0).hasClass(classes.avatar), true);
       assert.strictEqual(wrapper.childAt(0).hasClass('my-Avatar'), true);
-      assert.strictEqual(wrapper.childAt(0).prop('data-my-prop'), 'woofChip');
+      assert.strictEqual(wrapper.childAt(0).props()['data-my-prop'], 'woofChip');
     });
 
     it('should have a tabIndex prop', () => {
@@ -148,6 +149,32 @@ describe('<Chip />', () => {
         stopPropagationSpy.callCount,
         1,
         'should have called the stopPropagation handler',
+      );
+    });
+  });
+
+  describe('prop: deleteIcon', () => {
+    let wrapper;
+
+    before(() => {
+      wrapper = shallow(
+        <Chip
+          label="Custom delete icon Chip"
+          onRequestDelete={() => {}}
+          deleteIcon={<CheckBox />}
+        />,
+      );
+    });
+
+    it('should fire the function given in onDeleteRequest', () => {
+      const onRequestDeleteSpy = spy();
+      wrapper.setProps({ onRequestDelete: onRequestDeleteSpy });
+
+      wrapper.find(CheckBox).simulate('click', { stopPropagation: () => {} });
+      assert.strictEqual(
+        onRequestDeleteSpy.callCount,
+        1,
+        'should have called the onRequestDelete handler',
       );
     });
   });
@@ -186,8 +213,8 @@ describe('<Chip />', () => {
       });
 
       it('should unfocus when a esc key is pressed', () => {
-        // $FlowFixMe - HOC is hoisting of static Naked, not sure how to represent that
-        const wrapper2 = mount(<Chip.Naked classes={{}}>Text Chip</Chip.Naked>);
+        const ChipNaked = unwrap(Chip);
+        const wrapper2 = mount(<ChipNaked classes={{}}>Text Chip</ChipNaked>);
         const handleBlur = spy();
         wrapper2.instance().chipRef.blur = handleBlur;
         wrapper2.find('div').simulate('keydown', {

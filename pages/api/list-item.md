@@ -1,3 +1,7 @@
+---
+filename: /src/List/ListItem.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # ListItem
@@ -5,6 +9,7 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | button | boolean | false | If `true`, the ListItem will be a button. |
@@ -32,8 +37,9 @@ This property accepts the following keys:
 - `button`
 - `secondaryAction`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/List/ListItem.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

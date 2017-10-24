@@ -1,5 +1,4 @@
 import * as React from 'react';
-import { StyledComponent } from '../../src';
 import {
   withStyles,
   WithStyles,
@@ -10,7 +9,7 @@ import {
   StyleRules,
 } from '../../src/styles';
 import Button from '../../src/Button/Button';
-import { StyledComponentProps } from '../../src/index';
+import { StyleRulesCallback } from '../../src/styles/withStyles';
 
 // Shared types for examples
 type ComponentClassNames = 'root';
@@ -19,7 +18,7 @@ interface ComponentProps {
 }
 
 // Example 1
-const styles = ({ palette, spacing }) => ({
+const styles: StyleRulesCallback<'root'> = ({ palette, spacing }) => ({
   root: {
     padding: spacing.unit,
     background: palette.background,
@@ -106,7 +105,7 @@ function OverridesTheme() {
 const ThemedComponent: React.SFC<{ theme: Theme }> = ({ theme }) => (
   <div>{theme.spacing.unit}</div>
 );
-const ComponentWithTheme = withTheme(ThemedComponent);
+const ComponentWithTheme = withTheme()(ThemedComponent);
 
 // withStyles + withTheme
 interface AllTheProps {
@@ -118,17 +117,19 @@ const AllTheStyles: React.SFC<AllTheProps> = ({ theme, classes }) => (
   <div className={classes.root}>{theme.palette.text.primary}</div>
 );
 
-const AllTheComposition = withTheme(withStyles(styles)(AllTheStyles));
+const AllTheComposition = withTheme()(withStyles(styles)(AllTheStyles));
 
-@withStyles(styles)
-class DecoratedComponent extends React.Component<
-  ComponentProps & StyledComponentProps<'root'>
-> {
-  render() {
-    const { classes, text } = this.props;
-    return <div className={classes!.root}>{text}</div>;
+// Can't use withStyles effectively as a decorator in TypeScript
+// due to https://github.com/Microsoft/TypeScript/issues/4881
+//@withStyles(styles)
+const DecoratedComponent = withStyles(styles)(
+  class extends React.Component<ComponentProps & WithStyles<'root'>> {
+    render() {
+      const { classes, text } = this.props;
+      return <div className={classes.root}>{text}</div>;
+    }
   }
-}
+);
 
 // no 'classes' property required at element creation time (#8267)
 <DecoratedComponent text="foo" />;

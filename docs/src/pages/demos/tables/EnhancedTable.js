@@ -20,6 +20,7 @@ import Typography from 'material-ui/Typography';
 import Paper from 'material-ui/Paper';
 import Checkbox from 'material-ui/Checkbox';
 import IconButton from 'material-ui/IconButton';
+import Tooltip from 'material-ui/Tooltip';
 import DeleteIcon from 'material-ui-icons/Delete';
 import FilterListIcon from 'material-ui-icons/FilterList';
 
@@ -71,13 +72,19 @@ class EnhancedTableHead extends React.Component {
                 numeric={column.numeric}
                 padding={column.disablePadding ? 'none' : 'default'}
               >
-                <TableSortLabel
-                  active={orderBy === column.id}
-                  direction={order}
-                  onClick={this.createSortHandler(column.id)}
+                <Tooltip
+                  title="Sort"
+                  placement={column.numeric ? 'bottom-end' : 'bottom-start'}
+                  enterDelay={300}
                 >
-                  {column.label}
-                </TableSortLabel>
+                  <TableSortLabel
+                    active={orderBy === column.id}
+                    direction={order}
+                    onClick={this.createSortHandler(column.id)}
+                  >
+                    {column.label}
+                  </TableSortLabel>
+                </Tooltip>
               </TableCell>
             );
           }, this)}
@@ -131,13 +138,17 @@ let EnhancedTableToolbar = props => {
       <div className={classes.spacer} />
       <div className={classes.actions}>
         {numSelected > 0 ? (
-          <IconButton aria-label="Delete">
-            <DeleteIcon />
-          </IconButton>
+          <Tooltip title="Delete">
+            <IconButton aria-label="Delete">
+              <DeleteIcon />
+            </IconButton>
+          </Tooltip>
         ) : (
-          <IconButton aria-label="Filter list">
-            <FilterListIcon />
-          </IconButton>
+          <Tooltip title="Filter list">
+            <IconButton aria-label="Filter list">
+              <FilterListIcon />
+            </IconButton>
+          </Tooltip>
         )}
       </div>
     </Toolbar>
@@ -155,6 +166,9 @@ const styles = theme => ({
   root: {
     width: '100%',
     marginTop: theme.spacing.unit * 3,
+  },
+  table: {
+    minWidth: 800,
   },
   tableWrapper: {
     overflowX: 'auto',
@@ -250,14 +264,14 @@ class EnhancedTable extends React.Component {
   isSelected = id => this.state.selected.indexOf(id) !== -1;
 
   render() {
-    const classes = this.props.classes;
+    const { classes } = this.props;
     const { data, order, orderBy, selected, rowsPerPage, page } = this.state;
 
     return (
       <Paper className={classes.root}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <div className={classes.tableWrapper}>
-          <Table>
+          <Table className={classes.table}>
             <EnhancedTableHead
               numSelected={selected.length}
               order={order}
@@ -293,13 +307,15 @@ class EnhancedTable extends React.Component {
               })}
             </TableBody>
             <TableFooter>
-              <TablePagination
-                count={data.length}
-                rowsPerPage={rowsPerPage}
-                page={page}
-                onChangePage={this.handleChangePage}
-                onChangeRowsPerPage={this.handleChangeRowsPerPage}
-              />
+              <TableRow>
+                <TablePagination
+                  count={data.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onChangePage={this.handleChangePage}
+                  onChangeRowsPerPage={this.handleChangeRowsPerPage}
+                />
+              </TableRow>
             </TableFooter>
           </Table>
         </div>

@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import type { Element } from 'react';
+import type { Element, Node } from 'react';
 import classNames from 'classnames';
 import keycode from 'keycode';
 import withStyles from '../styles/withStyles';
@@ -102,9 +102,13 @@ export type Props = {
    */
   className?: string,
   /**
+   * Custom delete icon. Will be shown only if `onRequestDelete` is set.
+   */
+  deleteIcon?: Element<any>,
+  /**
    * The content of the label.
    */
-  label?: string | Element<any>,
+  label?: Node,
   /**
    * @ignore
    */
@@ -170,6 +174,7 @@ class Chip extends React.Component<ProvidedProps & Props> {
       onClick,
       onKeyDown,
       onRequestDelete,
+      deleteIcon: deleteIconProp,
       tabIndex: tabIndexProp,
       ...other
     } = this.props;
@@ -182,7 +187,12 @@ class Chip extends React.Component<ProvidedProps & Props> {
     );
 
     let deleteIcon = null;
-    if (onRequestDelete) {
+    if (onRequestDelete && deleteIconProp && React.isValidElement(deleteIconProp)) {
+      deleteIcon = React.cloneElement(deleteIconProp, {
+        onClick: this.handleDeleteIconClick,
+        className: classNames(classes.deleteIcon, deleteIconProp.props.className),
+      });
+    } else if (onRequestDelete) {
       deleteIcon = (
         <CancelIcon className={classes.deleteIcon} onClick={this.handleDeleteIconClick} />
       );
@@ -212,10 +222,10 @@ class Chip extends React.Component<ProvidedProps & Props> {
         tabIndex={tabIndex}
         onClick={onClick}
         onKeyDown={this.handleKeyDown}
+        {...other}
         ref={node => {
           this.chipRef = node;
         }}
-        {...other}
       >
         {avatar}
         <span className={classes.label}>{label}</span>

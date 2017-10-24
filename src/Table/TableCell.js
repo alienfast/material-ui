@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import type { ElementType, Node } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
+import { capitalizeFirstLetter } from '../utils/helpers';
 
 export type Context = {
   table: Object,
@@ -49,9 +50,6 @@ export type Props = {
 export const styles = (theme: Object) => ({
   root: {
     borderBottom: `1px solid ${theme.palette.text.lightDivider}`,
-    whiteSpace: 'nowrap',
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
     textAlign: 'left',
   },
   numeric: {
@@ -59,21 +57,21 @@ export const styles = (theme: Object) => ({
     flexDirection: 'row-reverse', // can be dynamically inherited at runtime by contents
   },
   head: {
-    whiteSpace: 'pre',
     fontWeight: theme.typography.fontWeightMedium,
+    position: 'relative', // Workaround for Tooltip positioning issue.
   },
-  padding: {
-    padding: `0 ${theme.spacing.unit * 7}px 0 ${theme.spacing.unit * 3}px`,
+  paddingDefault: {
+    padding: `${theme.spacing.unit / 2}px ${theme.spacing.unit * 7}px ${theme.spacing.unit /
+      2}px ${theme.spacing.unit * 3}px`,
     '&:last-child': {
       paddingRight: theme.spacing.unit * 3,
     },
   },
-  dense: {
+  paddingDense: {
     paddingRight: theme.spacing.unit * 3,
   },
-  checkbox: {
-    paddingLeft: 12,
-    paddingRight: 12,
+  paddingCheckbox: {
+    padding: '0 12px',
   },
   footer: {
     borderBottom: 0,
@@ -98,13 +96,14 @@ function TableCell(props: ProvidedProps & Props, context: Context) {
   } else {
     Component = table && table.head ? 'th' : 'td';
   }
+
   const className = classNames(
     classes.root,
     {
       [classes.numeric]: numeric,
-      [classes.dense]: padding === 'dense',
-      [classes.checkbox]: padding === 'checkbox',
-      [classes.padding]: padding !== 'none',
+      [classes[`padding${capitalizeFirstLetter(padding)}`]]:
+        padding !== 'none' && padding !== 'default',
+      [classes.paddingDefault]: padding !== 'none',
       [classes.head]: table && table.head,
       [classes.footer]: table && table.footer,
     },

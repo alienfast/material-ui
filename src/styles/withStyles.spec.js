@@ -4,8 +4,7 @@ import React from 'react';
 import { spy } from 'sinon';
 import { assert } from 'chai';
 import JssProvider from 'react-jss/lib/JssProvider';
-import { SheetsRegistry } from 'react-jss/lib/jss';
-import { create } from 'jss';
+import { create, SheetsRegistry } from 'jss';
 import preset from 'jss-preset-default';
 import withStyles from './withStyles';
 import MuiThemeProvider from './MuiThemeProvider';
@@ -14,7 +13,12 @@ import createGenerateClassName from './createGenerateClassName';
 import { createShallow, createMount, getClasses } from '../test-utils';
 import consoleErrorMock from '../../test/utils/consoleErrorMock';
 
-const Empty = () => <div />;
+// eslint-disable-next-line react/prefer-stateless-function
+class Empty extends React.Component<{}> {
+  render() {
+    return <div />;
+  }
+}
 
 describe('withStyles', () => {
   let shallow;
@@ -181,6 +185,25 @@ describe('withStyles', () => {
 
       assert.strictEqual(sheetsRegistry.registry.length, 1, 'should only attach once');
       assert.deepEqual(sheetsRegistry.registry[0].rules.raw, { root: { padding: 9 } });
+    });
+
+    describe('options: disableStylesGeneration', () => {
+      it('should not generate the styles', () => {
+        const styles = { root: { display: 'flex' } };
+        const StyledComponent = withStyles(styles)(Empty);
+
+        const wrapper = mount(
+          <MuiThemeProvider theme={createMuiTheme()} disableStylesGeneration>
+            <JssProvider registry={sheetsRegistry} jss={jss}>
+              <StyledComponent />
+            </JssProvider>
+          </MuiThemeProvider>,
+        );
+        assert.strictEqual(sheetsRegistry.registry.length, 0);
+        assert.deepEqual(wrapper.find(Empty).props().classes, {});
+        wrapper.unmount();
+        assert.strictEqual(sheetsRegistry.registry.length, 0);
+      });
     });
   });
 });

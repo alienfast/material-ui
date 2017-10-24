@@ -64,7 +64,6 @@ export const dark = {
     paper: grey[800],
     appBar: grey[900],
     contentFrame: grey[900],
-    status: common.black,
   },
 };
 
@@ -97,6 +96,9 @@ export default function createPalette(palette: Object) {
       getContrastText,
     },
     other,
+    {
+      clone: false, // No need to clone deep
+    },
   );
 
   // Dev warnings

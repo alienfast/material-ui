@@ -9,10 +9,11 @@ import getScrollbarSize from 'dom-helpers/util/scrollbarSize';
 import withStyles from '../styles/withStyles';
 import Popover from '../Popover';
 import MenuList from './MenuList';
-import type { TransitionCallback } from '../internal/Transition';
+import type { TransitionCallback } from '../internal/transition';
 
 type ProvidedProps = {
   classes: Object,
+  theme: Object,
 };
 
 export type Props = {
@@ -71,9 +72,23 @@ export type Props = {
    */
   open?: boolean,
   /**
+   * @ignore
+   */
+  theme?: Object,
+  /**
    * The length of the transition in `ms`, or 'auto'
    */
-  transitionDuration?: number | 'auto',
+  transitionDuration?: number | { enter?: number, exit?: number } | 'auto',
+};
+
+const rtlOrigin = {
+  vertical: 'top',
+  horizontal: 'right',
+};
+
+const ltrOrigin = {
+  vertical: 'top',
+  horizontal: 'left',
 };
 
 export const styles = {
@@ -128,6 +143,8 @@ class Menu extends React.Component<ProvidedProps & Props> {
   };
 
   handleEnter = (element: HTMLElement) => {
+    const { theme } = this.props;
+
     const menuList = findDOMNode(this.menuList);
 
     // Focus so the scroll computation of the Popover works as expected.
@@ -139,7 +156,7 @@ class Menu extends React.Component<ProvidedProps & Props> {
     if (menuList && element.clientHeight < menuList.clientHeight && !menuList.style.width) {
       const size = `${getScrollbarSize()}px`;
       // $FlowFixMe
-      menuList.style.paddingRight = size;
+      menuList.style[theme.direction === 'rtl' ? 'paddingLeft' : 'paddingRight'] = size;
       // $FlowFixMe
       menuList.style.width = `calc(100% + ${size})`;
     }
@@ -169,23 +186,25 @@ class Menu extends React.Component<ProvidedProps & Props> {
   };
 
   render() {
-    const { children, classes, className, MenuListProps, onEnter, ...other } = this.props;
+    const { children, classes, className, MenuListProps, onEnter, theme, ...other } = this.props;
 
     return (
       <Popover
         getContentAnchorEl={this.getContentAnchorEl}
         className={classNames(classes.root, className)}
         onEnter={this.handleEnter}
+        anchorOrigin={theme.direction === 'rtl' ? rtlOrigin : ltrOrigin}
+        transformOrigin={theme.direction === 'rtl' ? rtlOrigin : ltrOrigin}
         {...other}
       >
         <MenuList
           data-mui-test="Menu"
           role="menu"
+          onKeyDown={this.handleListKeyDown}
+          {...MenuListProps}
           ref={node => {
             this.menuList = node;
           }}
-          onKeyDown={this.handleListKeyDown}
-          {...MenuListProps}
         >
           {children}
         </MenuList>
@@ -194,4 +213,4 @@ class Menu extends React.Component<ProvidedProps & Props> {
   }
 }
 
-export default withStyles(styles, { name: 'MuiMenu' })(Menu);
+export default withStyles(styles, { withTheme: true, name: 'MuiMenu' })(Menu);

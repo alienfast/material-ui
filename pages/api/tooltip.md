@@ -1,3 +1,7 @@
+---
+filename: /src/Tooltip/Tooltip.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # Tooltip
@@ -5,10 +9,11 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | PopperProps | Object |  | Properties applied to the `Popper` element. |
-| <span style="color: #31a148">children *</span> | union:&nbsp;string<br>&nbsp;Element<any><br> |  | Tooltip reference component. |
+| <span style="color: #31a148">children *</span> | Element |  | Tooltip reference component. |
 | classes | Object |  | Useful to extend the style applied to components. |
 | disableTriggerFocus | boolean | false | Do not respond to focus events. |
 | disableTriggerHover | boolean | false | Do not respond to hover events. |
@@ -38,8 +43,9 @@ This property accepts the following keys:
 - `tooltipBottom`
 - `tooltipOpen`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/Tooltip/Tooltip.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

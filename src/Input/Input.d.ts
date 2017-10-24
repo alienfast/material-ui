@@ -1,13 +1,18 @@
 import * as React from 'react';
-import { StyledComponent, Omit } from '..';
+import { StandardProps } from '..';
 
-export type InputProps = {
+export interface InputProps extends StandardProps<
+  React.HTMLAttributes<HTMLDivElement>,
+  InputClassKey,
+  'onChange' | 'onKeyUp' | 'onKeyDown' | 'defaultValue'
+> {
   autoComplete?: string;
   autoFocus?: boolean;
   inputComponent?: React.ReactNode;
   defaultValue?: string | number;
   disabled?: boolean;
   disableUnderline?: boolean;
+  endAdornment?: React.ReactNode;
   error?: boolean;
   fullWidth?: boolean;
   id?: string;
@@ -21,6 +26,7 @@ export type InputProps = {
   placeholder?: string;
   rows?: string | number;
   rowsMax?: string | number;
+  startAdornment?: React.ReactNode;
   type?: string;
   value?: string | number;
   onClean?: () => void;
@@ -35,15 +41,8 @@ export type InputProps = {
    */
   onChange?: React.ChangeEventHandler<HTMLTextAreaElement | HTMLInputElement>;
   onKeyUp?: React.KeyboardEventHandler<HTMLTextAreaElement | HTMLInputElement>;
-  onKeyDown?: React.KeyboardEventHandler<
-    HTMLTextAreaElement | HTMLInputElement
-  >;
-} & Partial<
-  Omit<
-    React.HTMLAttributes<HTMLDivElement>,
-    'onChange' | 'onKeyUp' | 'onKeyDown'
-  >
->;
+  onKeyDown?: React.KeyboardEventHandler<HTMLTextAreaElement | HTMLInputElement>;
+}
 
 export type InputClassKey =
   | 'root'
@@ -63,6 +62,6 @@ export type InputClassKey =
   | 'fullWidth'
   ;
 
-declare const Input: StyledComponent<InputProps, InputClassKey>;
+declare const Input: React.ComponentType<InputProps>;
 
 export default Input;

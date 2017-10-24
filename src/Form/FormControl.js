@@ -5,7 +5,7 @@ import type { ElementType, Node } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
-import { isDirty } from '../Input/Input';
+import { isDirty, isAdorned } from '../Input/Input';
 import { isMuiElement } from '../utils/reactHelpers';
 
 export const styles = (theme: Object) => ({
@@ -71,7 +71,8 @@ export type Props = {
    */
   error?: boolean,
   /**
-   * If `true`, the label will take up the full width of its container.
+   * If `true`, the component, as well as its children,
+   * will take up the full width of its container.
    */
   fullWidth?: boolean,
   /**
@@ -93,6 +94,7 @@ export type Props = {
 };
 
 type State = {
+  adorned: boolean,
   dirty: boolean,
   focused: boolean,
 };
@@ -122,16 +124,18 @@ class FormControl extends React.Component<ProvidedProps & Props, State> {
   };
 
   state = {
+    adorned: false,
     dirty: false,
     focused: false,
   };
 
   getChildContext() {
     const { disabled, error, required, margin } = this.props;
-    const { dirty, focused } = this.state;
+    const { adorned, dirty, focused } = this.state;
 
     return {
       muiFormControl: {
+        adorned,
         dirty,
         disabled,
         error,
@@ -154,6 +158,9 @@ class FormControl extends React.Component<ProvidedProps & Props, State> {
       React.Children.forEach(children, child => {
         if (isMuiElement(child, ['Input', 'Select']) && isDirty(child.props, true)) {
           this.setState({ dirty: true });
+        }
+        if (isMuiElement(child, ['Input']) && isAdorned(child.props)) {
+          this.setState({ adorned: true });
         }
       });
     }

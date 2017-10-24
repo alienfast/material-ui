@@ -1,3 +1,7 @@
+---
+filename: /src/Drawer/Drawer.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # Drawer
@@ -5,6 +9,7 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | ModalProps | Object |  | Properties applied to the `Modal` element. |
@@ -35,8 +40,9 @@ This property accepts the following keys:
 - `paperAnchorDockedRight`
 - `modal`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/Drawer/Drawer.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

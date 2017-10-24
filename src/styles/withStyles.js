@@ -6,15 +6,19 @@ import warning from 'warning';
 import type { HigherOrderComponent } from 'react-flow-types';
 import hoistNonReactStatics from 'hoist-non-react-statics';
 import wrapDisplayName from 'recompose/wrapDisplayName';
-import createEagerFactory from 'recompose/createEagerFactory';
 import getDisplayName from 'recompose/getDisplayName';
 import contextTypes from 'react-jss/lib/contextTypes';
-import jss from 'react-jss/lib/jss';
+import { create } from 'jss';
+import preset from 'jss-preset-default';
+import rtl from 'jss-rtl';
 import * as ns from 'react-jss/lib/ns';
 import createMuiTheme from './createMuiTheme';
 import themeListener from './themeListener';
 import createGenerateClassName from './createGenerateClassName';
 import getStylesCreator from './getStylesCreator';
+
+const presets = preset().plugins;
+const jss = create({ plugins: [...presets, rtl()] });
 
 // Use a singleton or the provided one by the context.
 const generateClassName = createGenerateClassName();
@@ -47,6 +51,7 @@ function getDefaultTheme() {
 }
 
 type Options = {
+  flip?: boolean,
   withTheme?: boolean,
   name?: string,
 
@@ -84,8 +89,7 @@ const withStyles = (
   stylesOrCreator: Object,
   options?: Options = {},
 ): HigherOrderComponent<RequiredProps, InjectedProps> => (Component: any): any => {
-  const { withTheme = false, name, ...styleSheetOptions } = options;
-  const factory = createEagerFactory(Component);
+  const { withTheme = false, flip, name, ...styleSheetOptions } = options;
   const stylesCreator = getStylesCreator(stylesOrCreator);
   const listenToTheme = stylesCreator.themingEnabled || withTheme || typeof name === 'string';
 
@@ -104,7 +108,7 @@ const withStyles = (
 
   class Style extends React.Component<RequiredProps> {
     static contextTypes = {
-      sheetsManager: PropTypes.object,
+      muiThemeProviderOptions: PropTypes.object,
       ...contextTypes,
       ...(listenToTheme ? themeListener.contextTypes : {}),
     };
@@ -117,8 +121,19 @@ const withStyles = (
 
     constructor(props, context: Object) {
       super(props, context);
+
+      const { muiThemeProviderOptions } = this.context;
+
       this.jss = this.context[ns.jss] || jss;
-      this.sheetsManager = this.context.sheetsManager || sheetsManager;
+
+      if (muiThemeProviderOptions) {
+        if (muiThemeProviderOptions.sheetsManager) {
+          this.sheetsManager = muiThemeProviderOptions.sheetsManager;
+        }
+
+        this.disableStylesGeneration = muiThemeProviderOptions.disableStylesGeneration;
+      }
+
       // Attach the stylesCreator to the instance of the component as in the context
       // of react-hot-loader the hooks can be executed in a different closure context:
       // https://github.com/gaearon/react-hot-loader/blob/master/src/patch.dev.js#L107
@@ -163,6 +178,10 @@ const withStyles = (
     }
 
     attach(theme: Object) {
+      if (this.disableStylesGeneration) {
+        return;
+      }
+
       const stylesCreatorSaved = this.stylesCreatorSaved;
       let sheetManager = this.sheetsManager.get(stylesCreatorSaved);
 
@@ -187,13 +206,11 @@ const withStyles = (
 
         if (process.env.NODE_ENV !== 'production') {
           meta = name || getDisplayName(Component);
-          // Sanitize the string as will be used in development to prefix the generated
-          // class name.
-          meta = meta.replace(new RegExp(/[!"#$%&'()*+,./:;<=>?@[\\\]^`{|}~]/g), '-');
         }
 
         const sheet = this.jss.createStyleSheet(styles, {
           meta,
+          flip: typeof flip === 'boolean' ? flip : theme.direction === 'rtl',
           link: false,
           ...this.sheetOptions,
           ...stylesCreatorSaved.options,
@@ -214,6 +231,10 @@ const withStyles = (
     }
 
     detach(theme: Object) {
+      if (this.disableStylesGeneration) {
+        return;
+      }
+
       const stylesCreatorSaved = this.stylesCreatorSaved;
       const sheetManager = this.sheetsManager.get(stylesCreatorSaved);
       const sheetManagerTheme = sheetManager.get(theme);
@@ -232,7 +253,8 @@ const withStyles = (
 
     unsubscribeId = null;
     jss = null;
-    sheetsManager = null;
+    sheetsManager = sheetsManager;
+    disableStylesGeneration = false;
     stylesCreatorSaved = null;
     theme = null;
     sheetOptions = null;
@@ -242,16 +264,20 @@ const withStyles = (
       const { classes: classesProp, innerRef, ...other } = this.props;
 
       let classes;
-      const sheetManager = this.sheetsManager.get(this.stylesCreatorSaved);
-      const sheetsManagerTheme = sheetManager.get(this.theme);
-      const renderedClasses = sheetsManagerTheme.sheet.classes;
+      let renderedClasses = {};
+
+      if (!this.disableStylesGeneration) {
+        const sheetManager = this.sheetsManager.get(this.stylesCreatorSaved);
+        const sheetsManagerTheme = sheetManager.get(this.theme);
+        renderedClasses = sheetsManagerTheme.sheet.classes;
+      }
 
       if (classesProp) {
         classes = {
           ...renderedClasses,
           ...Object.keys(classesProp).reduce((accumulator, key) => {
             warning(
-              renderedClasses[key],
+              renderedClasses[key] || this.disableStylesGeneration,
               [
                 `Material-UI: the key \`${key}\` ` +
                   `provided to the classes property is not implemented in ${getDisplayName(
@@ -286,17 +312,12 @@ const withStyles = (
       const more = {};
 
       // Provide the theme to the wrapped component.
-      // So we don't have to use the `withTheme()` Higher-order component.
+      // So we don't have to use the `withTheme()` Higher-order Component.
       if (withTheme) {
         more.theme = this.theme;
       }
 
-      return factory({
-        classes,
-        ref: innerRef,
-        ...more,
-        ...other,
-      });
+      return <Component classes={classes} {...more} {...other} ref={innerRef} />;
     }
   }
 

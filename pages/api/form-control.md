@@ -1,3 +1,7 @@
+---
+filename: /src/Form/FormControl.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # FormControl
@@ -12,6 +16,7 @@ This context is used by the following components:
  - InputLabel
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | children | Node |  | The contents of the form control. |
@@ -19,7 +24,7 @@ This context is used by the following components:
 | component | ElementType | 'div' | The component used for the root node. Either a string to use a DOM element or a component. |
 | disabled | boolean | false | If `true`, the label, input and helper text should be displayed in a disabled state. |
 | error | boolean | false | If `true`, the label should be displayed in an error state. |
-| fullWidth | boolean | false | If `true`, the label will take up the full width of its container. |
+| fullWidth | boolean | false | If `true`, the component, as well as its children, will take up the full width of its container. |
 | margin | union:&nbsp;'none'<br>&nbsp;'dense'<br>&nbsp;'normal'<br> | 'none' | If `dense` or `normal`, will adjust vertical spacing of this and contained components. |
 | required | boolean | false | If `true`, the label will indicate that the input is required. |
 
@@ -34,8 +39,9 @@ This property accepts the following keys:
 - `marginDense`
 - `fullWidth`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/Form/FormControl.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

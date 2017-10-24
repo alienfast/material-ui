@@ -1,7 +1,7 @@
 // @flow weak
 
 import React from 'react';
-import type { ComponentType } from 'react';
+import type { Node, ComponentType } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
@@ -34,19 +34,30 @@ export function isDirty(obj, SSR = false) {
   );
 }
 
+// Determine if an Input is adorned
+//
+// Response determines if label is presented above field or as placeholder.
+//
+// @param obj
+// @returns {boolean} False when no adornments.
+//                    True when adorned.
+export function isAdorned(obj) {
+  return obj.startAdornment || obj.endAdornment;
+}
+
 export const styles = (theme: Object) => {
   const placeholder = {
     color: 'currentColor',
     opacity: theme.palette.type === 'light' ? 0.42 : 0.5,
-  };
-  const placeholderForm = {
-    opacity: 0,
     transition: theme.transitions.create('opacity', {
       duration: theme.transitions.duration.shorter,
       easing: theme.transitions.easing.ease,
     }),
   };
-  const placeholderFormFocus = {
+  const placeholderHidden = {
+    opacity: 0,
+  };
+  const placeholderVisible = {
     opacity: theme.palette.type === 'light' ? 0.42 : 0.5,
   };
 
@@ -57,7 +68,6 @@ export const styles = (theme: Object) => {
       position: 'relative',
       fontFamily: theme.typography.fontFamily,
       color: theme.palette.input.inputText,
-      paddingBottom: 2,
     },
     formControl: {
       'label + &': {
@@ -79,6 +89,7 @@ export const styles = (theme: Object) => {
           duration: theme.transitions.duration.shorter,
           easing: theme.transitions.easing.easeOut,
         }),
+        pointerEvent: 'none', // Transparent to the hover style.
       },
       '&$focused:after': {
         transform: 'scaleX(1)',
@@ -94,13 +105,13 @@ export const styles = (theme: Object) => {
       font: 'inherit',
       color: 'currentColor',
       // slight alteration to spec spacing to match visual spec result
-      padding: `${theme.spacing.unit - 1}px 0`,
+      padding: `${theme.spacing.unit - 1}px 0 ${theme.spacing.unit + 1}px`,
       border: 0,
-      display: 'block',
       boxSizing: 'content-box',
       verticalAlign: 'middle',
       background: 'none',
       margin: 0, // Reset for Safari
+      display: 'block',
       width: '100%',
       '&::-webkit-input-placeholder': placeholder,
       '&::-moz-placeholder': placeholder, // Firefox 19+
@@ -118,16 +129,20 @@ export const styles = (theme: Object) => {
         appearance: 'none',
       },
       // Show and hide the placeholder logic
-      'label + $formControl &': {
-        '&::-webkit-input-placeholder': placeholderForm,
-        '&::-moz-placeholder': placeholderForm, // Firefox 19+
-        '&:-ms-input-placeholder': placeholderForm, // IE 11
-        '&::-ms-input-placeholder': placeholderForm, // Edge
-        '&:focus::-webkit-input-placeholder': placeholderFormFocus,
-        '&:focus::-moz-placeholder': placeholderFormFocus, // Firefox 19+
-        '&:focus:-ms-input-placeholder': placeholderFormFocus, // IE 11
-        '&:focus::-ms-input-placeholder': placeholderFormFocus, // Edge
+      'label[data-shrink=false] + $formControl &': {
+        '&::-webkit-input-placeholder': placeholderHidden,
+        '&::-moz-placeholder': placeholderHidden, // Firefox 19+
+        '&:-ms-input-placeholder': placeholderHidden, // IE 11
+        '&::-ms-input-placeholder': placeholderHidden, // Edge
+        '&:focus::-webkit-input-placeholder': placeholderVisible,
+        '&:focus::-moz-placeholder': placeholderVisible, // Firefox 19+
+        '&:focus:-ms-input-placeholder': placeholderVisible, // IE 11
+        '&:focus::-ms-input-placeholder': placeholderVisible, // Edge
       },
+    },
+    inputAdorned: {
+      display: 'inline-block',
+      width: 'auto',
     },
     inputDense: {
       paddingTop: theme.spacing.unit / 2,
@@ -150,6 +165,7 @@ export const styles = (theme: Object) => {
           duration: theme.transitions.duration.shorter,
           easing: theme.transitions.easing.ease,
         }),
+        pointerEvent: 'none', // Transparent to the hover style.
       },
       '&:hover:not($disabled):before': {
         backgroundColor: theme.palette.text.primary,
@@ -197,8 +213,8 @@ type ProvidedProps = {
 export type Props = {
   /**
    * This property helps users to fill forms faster, especially on mobile devices.
-   * The name can be confusion, it's more like an autofill.
-   * You can learn about it with that article
+   * The name can be confusing, it's more like an autofill.
+   * You can learn more about it in this article
    * https://developers.google.com/web/updates/2015/06/checkout-faster-with-autofill
    */
   autoComplete?: string,
@@ -226,6 +242,10 @@ export type Props = {
    * If `true`, the input will not have an underline.
    */
   disableUnderline?: boolean,
+  /**
+   * End `InputAdornment` for this component.
+   */
+  endAdornment?: Node,
   /**
    * If `true`, the input will indicate an error. This is normally obtained via context from
    * FormControl.
@@ -312,6 +332,10 @@ export type Props = {
    * Maximum number of rows to display when multiline option is set to true.
    */
   rowsMax?: string | number,
+  /**
+   * Start `InputAdornment` for this component.
+   */
+  startAdornment?: Node,
   /**
    * Type of the input element. It should be a valid HTML5 input type.
    */
@@ -431,6 +455,7 @@ class Input extends React.Component<ProvidedProps & Props, State> {
       defaultValue,
       disabled: disabledProp,
       disableUnderline,
+      endAdornment,
       error: errorProp,
       fullWidth,
       id,
@@ -451,7 +476,9 @@ class Input extends React.Component<ProvidedProps & Props, State> {
       readOnly,
       rows,
       rowsMax,
+      startAdornment,
       type,
+      // $FlowFixMe
       value,
       ...other
     } = this.props;
@@ -499,6 +526,7 @@ class Input extends React.Component<ProvidedProps & Props, State> {
         [classes.inputSearch]: type === 'search',
         [classes.inputMultiline]: multiline,
         [classes.inputDense]: margin === 'dense',
+        [classes.inputAdorned]: startAdornment || endAdornment,
       },
       inputPropsClassName,
     );
@@ -535,8 +563,9 @@ class Input extends React.Component<ProvidedProps & Props, State> {
       }
     }
 
-    const renderInput = coercedValue => (
+    return (
       <div onBlur={this.handleBlur} onFocus={this.handleFocus} className={className} {...other}>
+        {startAdornment}
         <InputComponent
           autoComplete={autoComplete}
           autoFocus={autoFocus}
@@ -546,7 +575,7 @@ class Input extends React.Component<ProvidedProps & Props, State> {
           onKeyDown={onKeyDown}
           disabled={disabled}
           required={required ? true : undefined}
-          value={coercedValue}
+          value={value}
           id={id}
           name={name}
           defaultValue={defaultValue}
@@ -556,14 +585,9 @@ class Input extends React.Component<ProvidedProps & Props, State> {
           rows={rows}
           {...inputProps}
         />
+        {endAdornment}
       </div>
     );
-
-    // Textarea value coercion
-    if (InputComponent === Textarea) {
-      return renderInput(value ? String(value) : undefined);
-    }
-    return renderInput(value);
   }
 }
 

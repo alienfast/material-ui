@@ -164,21 +164,15 @@ export default function createSwitch(
     button = null;
     isControlled = null;
 
-    handleInputChange = event => {
-      let newChecked;
+    handleInputChange = (event: SyntheticInputEvent<*>) => {
+      const checked = event.target.checked;
 
-      if (this.isControlled) {
-        newChecked = !this.props.checked;
-      } else {
-        newChecked = !this.state.checked;
-        if (this.input && this.input.checked !== newChecked) {
-          this.input.checked = newChecked;
-        }
-        this.setState({ checked: !this.state.checked });
+      if (!this.isControlled) {
+        this.setState({ checked });
       }
 
       if (this.props.onChange) {
-        this.props.onChange(event, newChecked);
+        this.props.onChange(event, checked);
       }
     };
 
@@ -228,12 +222,6 @@ export default function createSwitch(
         >
           {icon}
           <input
-            ref={node => {
-              this.input = node;
-              if (inputRef) {
-                inputRef(node);
-              }
-            }}
             type={inputType}
             name={name}
             checked={this.isControlled ? checkedProp : undefined}
@@ -243,6 +231,12 @@ export default function createSwitch(
             tabIndex={tabIndex}
             value={value}
             {...inputProps}
+            ref={node => {
+              this.input = node;
+              if (inputRef) {
+                inputRef(node);
+              }
+            }}
           />
         </IconButton>
       );

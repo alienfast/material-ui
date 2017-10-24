@@ -1,50 +1,49 @@
 // @flow
 
 import React from 'react';
+import { ReactWrapper } from 'enzyme';
 import { assert } from 'chai';
-import { spy, stub } from 'sinon';
-import { createShallow, createMount, getClasses } from '../test-utils';
+import { spy, stub, useFakeTimers } from 'sinon';
+import { createShallow, createMount, getClasses, unwrap } from '../test-utils';
 import Collapse from './Collapse';
 
 describe('<Collapse />', () => {
   let shallow;
   let classes;
+  const props = {
+    in: true,
+    children: <div />,
+  };
 
   before(() => {
     shallow = createShallow({ dive: true });
-    classes = getClasses(<Collapse />);
+    classes = getClasses(<Collapse {...props} />);
   });
 
   it('should render a Transition', () => {
-    const wrapper = shallow(<Collapse />);
+    const wrapper = shallow(<Collapse {...props} />);
     assert.strictEqual(wrapper.name(), 'Transition');
   });
 
   it('should render a container around the wrapper', () => {
-    const wrapper = shallow(<Collapse classes={{ container: 'woofCollapse1' }} />);
-    assert.strictEqual(wrapper.childAt(0).is('div'), true, 'should be a div');
-    assert.strictEqual(wrapper.childAt(0).hasClass(classes.container), true);
-    assert.strictEqual(wrapper.childAt(0).hasClass('woofCollapse1'), true);
+    const wrapper = shallow(<Collapse {...props} classes={{ container: 'woofCollapse1' }} />);
+    const child = new ReactWrapper(wrapper.props().children('entered'));
+    assert.strictEqual(child.name(), 'div');
+    assert.strictEqual(child.hasClass(classes.container), true);
+    assert.strictEqual(child.hasClass('woofCollapse1'), true);
   });
 
   it('should render a wrapper around the children', () => {
     const children = <h1>Hello</h1>;
-    const wrapper = shallow(<Collapse>{children}</Collapse>);
+    const wrapper = shallow(<Collapse {...props}>{children}</Collapse>);
+    const child = new ReactWrapper(wrapper.props().children('entered'));
+    assert.strictEqual(child.childAt(0).is('div'), true, 'should be a div');
     assert.strictEqual(
-      wrapper
-        .childAt(0)
-        .childAt(0)
-        .is('div'),
-      true,
-      'should be a div',
-    );
-    assert.strictEqual(
-      wrapper
-        .childAt(0)
+      child
         .childAt(0)
         .children()
-        .equals(children),
-      true,
+        .type(),
+      'h1',
       'should wrap the children',
     );
   });
@@ -58,7 +57,7 @@ describe('<Collapse />', () => {
         return result;
       }, {});
 
-      const wrapper = shallow(<Collapse {...handlers} />);
+      const wrapper = shallow(<Collapse {...props} {...handlers} />);
 
       events.forEach(n => {
         const event = n.charAt(2).toLowerCase() + n.slice(3);
@@ -68,7 +67,7 @@ describe('<Collapse />', () => {
     });
   });
 
-  describe('props: transitionDuration', () => {
+  describe('prop: timeout', () => {
     let wrapper;
     let instance;
     let element;
@@ -78,7 +77,8 @@ describe('<Collapse />', () => {
     beforeEach(() => {
       wrapper = shallow(
         <Collapse
-          transitionDuration={{
+          {...props}
+          timeout={{
             enter: enterDuration,
             exit: leaveDuration,
           }}
@@ -104,7 +104,7 @@ describe('<Collapse />', () => {
     let instance;
 
     before(() => {
-      wrapper = shallow(<Collapse />);
+      wrapper = shallow(<Collapse {...props} />);
       instance = wrapper.instance();
     });
 
@@ -145,16 +145,16 @@ describe('<Collapse />', () => {
         assert.strictEqual(onEnteringStub.calledWith(element), true);
       });
 
-      describe('transitionDuration', () => {
+      describe('timeout', () => {
         let theme;
-        let transitionDurationMock;
+        let timeoutMock;
         let restore;
 
         before(() => {
           theme = instance.props.theme;
           restore = theme.transitions.getAutoHeightDuration;
           theme.transitions.getAutoHeightDuration = stub().returns('woofCollapseStub');
-          wrapper.setProps({ transitionDuration: 'auto' });
+          wrapper.setProps({ timeout: 'auto' });
           instance = wrapper.instance();
         });
         after(() => {
@@ -184,18 +184,18 @@ describe('<Collapse />', () => {
           );
         });
 
-        it('number should set transitionDuration to ms', () => {
-          transitionDurationMock = 3;
-          wrapper.setProps({ transitionDuration: transitionDurationMock });
+        it('number should set timeout to ms', () => {
+          timeoutMock = 3;
+          wrapper.setProps({ timeout: timeoutMock });
           instance = wrapper.instance();
           instance.handleEntering(element);
 
-          assert.strictEqual(element.style.transitionDuration, `${transitionDurationMock}ms`);
+          assert.strictEqual(element.style.transitionDuration, `${timeoutMock}ms`);
         });
 
-        it('nothing should not set transitionDuration', () => {
+        it('nothing should not set timeout', () => {
           const elementBackup = element;
-          wrapper.setProps({ transitionDuration: undefined });
+          wrapper.setProps({ timeout: undefined });
           instance = wrapper.instance();
           instance.handleEntering(element);
 
@@ -214,16 +214,12 @@ describe('<Collapse />', () => {
       let onEnteredSpy;
 
       before(() => {
-        handleEnteredWrapper = shallow(<Collapse />);
+        handleEnteredWrapper = shallow(<Collapse {...props} />);
         onEnteredSpy = spy();
         handleEnteredWrapper.setProps({ onEntered: onEnteredSpy });
         handleEnteredInstance = handleEnteredWrapper.instance();
         element = { style: { height: 666, transitionDuration: '500ms' } };
         handleEnteredInstance.handleEntered(element);
-      });
-
-      it('should set element transition duration to 0 to fix a safari bug', () => {
-        assert.strictEqual(element.style.transitionDuration, '0ms', 'should have 0ms duration');
       });
 
       it('should set height to auto', () => {
@@ -236,15 +232,10 @@ describe('<Collapse />', () => {
     });
 
     describe('handleExit()', () => {
-      let element;
-
-      before(() => {
-        element = { style: { height: 'auto' } };
+      it('should set height to the wrapper height', () => {
+        const element = { style: { height: 'auto' } };
         instance.wrapper = { clientHeight: 666 };
         instance.handleExit(element);
-      });
-
-      it('should set height to the wrapper height', () => {
         assert.strictEqual(element.style.height, '666px', 'should have 666px height');
       });
     });
@@ -271,16 +262,16 @@ describe('<Collapse />', () => {
         assert.strictEqual(onExitingStub.calledWith(element), true);
       });
 
-      describe('transitionDuration', () => {
+      describe('timeout', () => {
         let theme;
-        let transitionDurationMock;
+        let timeoutMock;
         let restore;
 
         before(() => {
           theme = instance.props.theme;
           restore = theme.transitions.getAutoHeightDuration;
           theme.transitions.getAutoHeightDuration = stub().returns('woofCollapseStub2');
-          wrapper.setProps({ transitionDuration: 'auto' });
+          wrapper.setProps({ timeout: 'auto' });
           instance = wrapper.instance();
         });
         after(() => {
@@ -310,18 +301,18 @@ describe('<Collapse />', () => {
           );
         });
 
-        it('number should set transitionDuration to ms', () => {
-          transitionDurationMock = 3;
-          wrapper.setProps({ transitionDuration: transitionDurationMock });
+        it('number should set timeout to ms', () => {
+          timeoutMock = 3;
+          wrapper.setProps({ timeout: timeoutMock });
           instance = wrapper.instance();
           instance.handleExiting(element);
 
-          assert.strictEqual(element.style.transitionDuration, `${transitionDurationMock}ms`);
+          assert.strictEqual(element.style.transitionDuration, `${timeoutMock}ms`);
         });
 
-        it('nothing should not set transitionDuration', () => {
+        it('nothing should not set timeout', () => {
           const elementBackup = element;
-          wrapper.setProps({ transitionDuration: undefined });
+          wrapper.setProps({ timeout: undefined });
           instance = wrapper.instance();
           instance.handleExiting(element);
 
@@ -335,28 +326,46 @@ describe('<Collapse />', () => {
   });
 
   describe('handleRequestTimeout()', () => {
-    let wrapper;
     let instance;
+    let clock;
 
-    beforeEach(() => {
-      wrapper = shallow(<Collapse />);
+    before(() => {
+      clock = useFakeTimers();
     });
 
-    it('should return autoTransitionDuration when transitionDuration is auto', () => {
-      wrapper.setProps({ transitionDuration: 'auto' });
+    after(() => {
+      clock.restore();
+    });
+
+    it('should return autoTransitionDuration when timeout is auto', () => {
+      const wrapper = shallow(<Collapse {...props} timeout="auto" />);
       instance = wrapper.instance();
+      const next = spy();
+
       const autoTransitionDuration = 10;
       instance.autoTransitionDuration = autoTransitionDuration;
-      assert.strictEqual(instance.handleRequestTimeout(), autoTransitionDuration);
+      instance.addEndListener(null, next);
+      assert.strictEqual(next.callCount, 0);
+      clock.tick(autoTransitionDuration);
+      assert.strictEqual(next.callCount, 1);
+
       instance.autoTransitionDuration = undefined;
-      assert.strictEqual(instance.handleRequestTimeout(), 0);
+      instance.addEndListener(null, next);
+      assert.strictEqual(next.callCount, 1);
+      clock.tick(0);
+      assert.strictEqual(next.callCount, 2);
     });
 
-    it('should return props.transitionDuration when transitionDuration is number', () => {
-      const transitionDuration = 10;
-      wrapper.setProps({ transitionDuration });
+    it('should return props.timeout when timeout is number', () => {
+      const timeout = 10;
+      const wrapper = shallow(<Collapse {...props} timeout={timeout} />);
       instance = wrapper.instance();
-      assert.strictEqual(instance.handleRequestTimeout(), transitionDuration);
+
+      const next = spy();
+      instance.addEndListener(null, next);
+      assert.strictEqual(next.callCount, 0);
+      clock.tick(timeout);
+      assert.strictEqual(next.callCount, 1);
     });
   });
 
@@ -366,8 +375,8 @@ describe('<Collapse />', () => {
 
     before(() => {
       mount = createMount();
-      // $FlowFixMe - HOC is hoisting of static Naked, not sure how to represent that
-      mountInstance = mount(<Collapse.Naked classes={{}} theme={{}} />).instance();
+      const CollapseNaked = unwrap(Collapse);
+      mountInstance = mount(<CollapseNaked classes={{}} theme={{}} />).instance();
     });
 
     after(() => {
@@ -376,6 +385,23 @@ describe('<Collapse />', () => {
 
     it('instance should have a wrapper property', () => {
       assert.notStrictEqual(mountInstance.wrapper, undefined);
+    });
+  });
+
+  describe('prop: collapsedHeight', () => {
+    const collapsedHeight = '10px';
+
+    it('should work when closed', () => {
+      const wrapper = shallow(<Collapse {...props} collapsedHeight={collapsedHeight} />);
+      assert.strictEqual(wrapper.props().style.minHeight, collapsedHeight);
+    });
+
+    it('should be taken into account in handleExiting', () => {
+      const wrapper = shallow(<Collapse {...props} collapsedHeight={collapsedHeight} />);
+      const instance = wrapper.instance();
+      const element = { style: { height: 666, transitionDuration: undefined } };
+      instance.handleExiting(element);
+      assert.strictEqual(element.style.height, collapsedHeight, 'should have 0px height');
     });
   });
 });

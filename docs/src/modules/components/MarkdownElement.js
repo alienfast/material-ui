@@ -52,7 +52,7 @@ marked.setOptions({
   renderer,
 });
 
-const anchorLinkStyle = theme => ({
+const anchorLinkStyle = (theme, size) => ({
   '& .anchor-link-style': {
     opacity: 0,
     // To prevent the link to get the focus.
@@ -61,13 +61,13 @@ const anchorLinkStyle = theme => ({
   '&:hover .anchor-link-style': {
     display: 'inline-block',
     opacity: 1,
-    paddingLeft: theme.spacing.unit,
+    padding: `0 ${theme.spacing.unit}px`,
     color: theme.palette.text.hint,
     '&:hover': {
       color: theme.palette.text.secondary,
     },
     '& svg': {
-      width: 20,
+      width: size,
       fill: 'currentColor',
     },
   },
@@ -104,29 +104,33 @@ const styles = theme => ({
       fontSize: 14,
       lineHeight: 1.6,
     },
+    '& h1 code, & h2 code, & h3 code, & h4 code': {
+      fontSize: 'inherit',
+      lineHeight: 'inherit',
+    },
     '& h1': {
       ...theme.typography.display2,
       color: theme.palette.text.secondary,
       margin: '0.7em 0',
-      ...anchorLinkStyle(theme),
+      ...anchorLinkStyle(theme, 20),
     },
     '& h2': {
       ...theme.typography.display1,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme),
+      ...anchorLinkStyle(theme, 18),
     },
     '& h3': {
       ...theme.typography.headline,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme),
+      ...anchorLinkStyle(theme, 16),
     },
     '& h4': {
       ...theme.typography.title,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme),
+      ...anchorLinkStyle(theme, 14),
     },
     '& p, & ul, & ol': {
       lineHeight: 1.6,
@@ -220,4 +224,4 @@ function MarkdownElement(props: Props) {
   /* eslint-enable */
 }
 
-export default withStyles(styles)(MarkdownElement);
+export default withStyles(styles, { flip: false })(MarkdownElement);

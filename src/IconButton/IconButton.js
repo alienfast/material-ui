@@ -8,6 +8,7 @@ import withStyles from '../styles/withStyles';
 import ButtonBase from '../ButtonBase';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import Icon from '../Icon';
+import '../SvgIcon'; // Ensure CSS specificity
 import { isMuiElement } from '../utils/reactHelpers';
 
 export const styles = (theme: Object) => ({
@@ -110,15 +111,15 @@ function IconButton(props: ProvidedProps & Props) {
       centerRipple
       keyboardFocusedClassName={classes.keyboardFocused}
       disabled={disabled}
-      ref={rootRef}
       {...other}
+      ref={rootRef}
     >
       <span className={classes.label}>
         {typeof children === 'string' ? (
           <Icon className={classes.icon}>{children}</Icon>
         ) : (
           React.Children.map(children, child => {
-            if (isMuiElement(child, ['Icon'])) {
+            if (isMuiElement(child, ['Icon', 'SvgIcon'])) {
               return React.cloneElement(child, {
                 className: classNames(classes.icon, child.props.className),
               });

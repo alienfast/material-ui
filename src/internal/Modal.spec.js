@@ -17,7 +17,7 @@ describe('<Modal />', () => {
   let classes;
 
   before(() => {
-    shallow = createShallow({ dive: true });
+    shallow = createShallow({ dive: true, disableLifecycleMethods: true });
     classes = getClasses(<Modal />);
     mount = createMount();
   });
@@ -147,9 +147,9 @@ describe('<Modal />', () => {
     });
 
     it('should pass a transitionDuration prop to the transition component', () => {
-      wrapper.setProps({ backdropTransitionDuration: 200 });
+      wrapper.setProps({ BackdropTransitionDuration: 200 });
       const transition = wrapper.childAt(0).childAt(0);
-      assert.strictEqual(transition.props().transitionDuration, 200);
+      assert.strictEqual(transition.props().timeout, 200);
     });
 
     it('should attach a handler to the backdrop that fires onRequestClose', () => {
@@ -216,7 +216,7 @@ describe('<Modal />', () => {
 
       it('should render the content into the portal', () => {
         wrapper.setProps({ show: true });
-        const portalLayer = wrapper.find('Portal').getNode().layer;
+        const portalLayer = wrapper.find('Portal').instance().layer;
         const container = document.getElementById('container');
         const heading = document.getElementById('heading');
 
@@ -451,7 +451,9 @@ describe('<Modal />', () => {
       const handleExited = spy();
       const wrapper = shallow(
         <Modal onExited={handleExited} show>
-          <Fade in />
+          <Fade in>
+            <div />
+          </Fade>
         </Modal>,
       );
       wrapper

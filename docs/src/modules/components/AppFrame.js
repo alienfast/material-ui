@@ -1,4 +1,4 @@
-// @flow
+/* eslint-disable flowtype/require-valid-file-annotation */
 
 import React from 'react';
 import PropTypes from 'prop-types';
@@ -11,13 +11,16 @@ import Typography from 'material-ui/Typography';
 import AppBar from 'material-ui/AppBar';
 import Toolbar from 'material-ui/Toolbar';
 import IconButton from 'material-ui/IconButton';
+import Tooltip from 'material-ui/Tooltip';
 import MenuIcon from 'material-ui-icons/Menu';
 import LightbulbOutline from 'material-ui-icons/LightbulbOutline';
+import FormatTextdirectionLToR from 'material-ui-icons/FormatTextdirectionLToR';
+import FormatTextdirectionRToL from 'material-ui-icons/FormatTextdirectionRToL';
 import Github from 'docs/src/modules/components/GitHub';
 import AppDrawer from 'docs/src/modules/components/AppDrawer';
 import AppSearch from 'docs/src/modules/components/AppSearch';
-import Tooltip from 'material-ui/Tooltip';
 import { pageToTitle } from 'docs/src/modules/utils/helpers';
+import actionTypes from 'docs/src/modules/redux/actionTypes';
 
 // Disaply a progress bar between route transitions
 NProgress.configure({
@@ -48,6 +51,9 @@ const styles = theme => ({
       WebkitFontSmoothing: 'antialiased', // Antialiasing.
       MozOsxFontSmoothing: 'grayscale', // Antialiasing.
       boxSizing: 'border-box',
+      '@media print': {
+        background: theme.palette.common.white,
+      },
     },
     '*, *:before, *:after': {
       boxSizing: 'inherit',
@@ -59,7 +65,8 @@ const styles = theme => ({
       pointerEvents: 'none',
       '& .bar': {
         position: 'fixed',
-        background: '#000',
+        background:
+          theme.palette.type === 'light' ? theme.palette.common.black : theme.palette.common.white,
         borderRadius: 1,
         zIndex: theme.zIndex.tooltip,
         top: 0,
@@ -71,7 +78,9 @@ const styles = theme => ({
         position: 'absolute',
         top: 0,
         height: 2,
-        boxShadow: '#000 1px 0 6px 1px',
+        boxShadow: `${theme.palette.type === 'light'
+          ? theme.palette.common.black
+          : theme.palette.common.white} 1px 0 6px 1px`,
         borderRadius: '100%',
         animation: 'nprogress-pulse 2s ease-out 0s infinite',
       },
@@ -115,6 +124,9 @@ const styles = theme => ({
   },
   appBar: {
     transition: theme.transitions.create('width'),
+    '@media print': {
+      position: 'absolute',
+    },
   },
   appBarHome: {
     boxShadow: 'none',
@@ -141,20 +153,30 @@ class AppFrame extends React.Component<any, any> {
     mobileOpen: false,
   };
 
-  handleDrawerClose = () => {
-    this.setState({ mobileOpen: false });
-  };
-
   handleDrawerToggle = () => {
     this.setState({ mobileOpen: !this.state.mobileOpen });
   };
 
-  handleToggleShade = () => {
-    this.props.dispatch({ type: 'TOGGLE_THEME_SHADE' });
+  handleTogglePaletteType = () => {
+    this.props.dispatch({
+      type: actionTypes.THEME_CHANGE_PALETTE_TYPE,
+      payload: {
+        paletteType: this.props.uiTheme.paletteType === 'light' ? 'dark' : 'light',
+      },
+    });
+  };
+
+  handleToggleDirection = () => {
+    this.props.dispatch({
+      type: actionTypes.THEME_CHANGE_DIRECTION,
+      payload: {
+        direction: this.props.uiTheme.direction === 'ltr' ? 'rtl' : 'ltr',
+      },
+    });
   };
 
   render() {
-    const { children, classes } = this.props;
+    const { children, classes, uiTheme } = this.props;
     const title =
       this.context.activePage.title !== false ? pageToTitle(this.context.activePage) : null;
 
@@ -167,7 +189,7 @@ class AppFrame extends React.Component<any, any> {
       disablePermanent = true;
       appBarClassName += ` ${classes.appBarHome}`;
     } else {
-      navIconClassName += ` ${classes.navIconHide}`;
+      navIconClassName = classes.navIconHide;
       appBarClassName += ` ${classes.appBarShift}`;
     }
 
@@ -194,9 +216,22 @@ class AppFrame extends React.Component<any, any> {
               <IconButton
                 color="contrast"
                 aria-label="change theme"
-                onClick={this.handleToggleShade}
+                onClick={this.handleTogglePaletteType}
               >
                 <LightbulbOutline />
+              </IconButton>
+            </Tooltip>
+            <Tooltip title="Toggle right-to-left/left-to-right" enterDelay={300}>
+              <IconButton
+                color="contrast"
+                aria-label="change direction"
+                onClick={this.handleToggleDirection}
+              >
+                {uiTheme.direction === 'rtl' ? (
+                  <FormatTextdirectionLToR />
+                ) : (
+                  <FormatTextdirectionRToL />
+                )}
               </IconButton>
             </Tooltip>
             <IconButton
@@ -212,7 +247,7 @@ class AppFrame extends React.Component<any, any> {
         <AppDrawer
           className={classes.drawer}
           disablePermanent={disablePermanent}
-          onRequestClose={this.handleDrawerClose}
+          onRequestClose={this.handleDrawerToggle}
           mobileOpen={this.state.mobileOpen}
         />
         {children}
@@ -225,6 +260,7 @@ AppFrame.propTypes = {
   children: PropTypes.node.isRequired,
   classes: PropTypes.object.isRequired,
   dispatch: PropTypes.func.isRequired,
+  uiTheme: PropTypes.object.isRequired,
 };
 
 AppFrame.contextTypes = {
@@ -237,5 +273,7 @@ export default compose(
   withStyles(styles, {
     name: 'AppFrame',
   }),
-  connect(),
+  connect(state => ({
+    uiTheme: state.theme,
+  })),
 )(AppFrame);

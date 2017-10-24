@@ -1,25 +1,30 @@
 import * as React from 'react';
-import { StyledComponent, Omit } from '..';
+import { StandardProps } from '..';
 import { InputProps } from '../Input';
+import { InputClassKey } from '../Input/Input';
 
-export type SelectProps = {
+export interface SelectProps extends StandardProps<
+  InputProps,
+  SelectClassKey,
+  'value'
+> {
   autoWidth?: boolean;
+  displayEmpty?: boolean;
   input?: React.ReactNode;
   native?: boolean;
   multiple?: boolean;
   MenuProps?: Object;
   renderValue?: Function;
   value?: Array<string | number> | string | number;
-} & Partial<Omit<InputProps, 'value'>>;
+}
 
 type SelectClassKey =
-  | 'root'
+  | InputClassKey
   | 'select'
   | 'selectMenu'
-  | 'disabled'
   | 'icon'
   ;
 
-declare const Select: StyledComponent<SelectProps, SelectClassKey>;
+declare const Select: React.ComponentType<SelectProps>;
 
 export default Select;

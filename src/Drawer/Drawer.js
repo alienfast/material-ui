@@ -9,7 +9,7 @@ import Slide from '../transitions/Slide';
 import Paper from '../Paper';
 import { capitalizeFirstLetter } from '../utils/helpers';
 import { duration } from '../styles/transitions';
-import type { TransitionDuration } from '../internal/Transition';
+import type { TransitionDuration } from '../internal/transition';
 
 function getSlideDirection(anchor) {
   if (anchor === 'left') {
@@ -188,7 +188,7 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
       ...other
     } = this.props;
 
-    const rtl = theme.dir === 'rtl';
+    const rtl = theme.direction === 'rtl';
     let anchor = anchorProp;
     if (rtl && ['left', 'right'].includes(anchor)) {
       anchor = anchor === 'left' ? 'right' : 'left';
@@ -219,8 +219,8 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
       <Slide
         in={open}
         direction={getSlideDirection(anchor)}
-        transitionDuration={transitionDuration}
-        transitionAppear={!this.state.firstMount}
+        timeout={transitionDuration}
+        appear={!this.state.firstMount}
         {...SlideProps}
       >
         {drawer}
@@ -238,7 +238,7 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
     // type === temporary
     return (
       <Modal
-        backdropTransitionDuration={transitionDuration}
+        BackdropTransitionDuration={transitionDuration}
         className={classNames(classes.modal, className)}
         show={open}
         onRequestClose={onRequestClose}
@@ -251,4 +251,4 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
   }
 }
 
-export default withStyles(styles, { withTheme: true, name: 'MuiDrawer' })(Drawer);
+export default withStyles(styles, { flip: false, withTheme: true, name: 'MuiDrawer' })(Drawer);

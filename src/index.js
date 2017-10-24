@@ -22,7 +22,7 @@ export { FormControl, FormGroup, FormLabel, FormHelperText, FormControlLabel } f
 export { default as Hidden } from './Hidden';
 export { default as Icon } from './Icon';
 export { default as IconButton } from './IconButton';
-export { default as Input, InputLabel } from './Input';
+export { default as Input, InputLabel, InputAdornment } from './Input';
 export { default as Grid } from './Grid';
 export {
   default as List,
@@ -64,3 +64,5 @@ export { default as Typography } from './Typography';
 export { default as TextField } from './TextField';
 export { default as Toolbar } from './Toolbar';
 export { default as Tooltip } from './Tooltip';
+
+export { default as withWidth } from './utils/withWidth';

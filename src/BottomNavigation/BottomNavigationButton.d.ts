@@ -1,19 +1,23 @@
 import * as React from 'react';
-import { StyledComponent, Omit } from '..';
-import { ButtonBaseProps } from '../ButtonBase';
+import { StandardProps } from '..';
+import { ButtonBaseProps, ButtonBaseClassKey } from '../ButtonBase';
 
-export type BottomNavigationButtonProps = {
-  icon?: React.ReactNode;
+export interface BottomNavigationButtonProps extends StandardProps<
+  ButtonBaseProps,
+  BottomNavigationButtonClassKey,
+  'onChange'
+> {
+  icon?: string | React.ReactElement<any>;
   label?: React.ReactNode;
   onChange?: (event: React.ChangeEvent<{}>, value: any) => void;
   onClick?: React.ReactEventHandler<any>;
   selected?: boolean;
   showLabel?: boolean;
   value?: any;
-} & Partial<Omit<ButtonBaseProps, 'onChange'>>;
+}
 
 export type BottomNavigationButtonClassKey =
-  | 'root'
+  | ButtonBaseClassKey
   | 'selected'
   | 'selectedIconOnly'
   | 'wrapper'
@@ -23,6 +27,6 @@ export type BottomNavigationButtonClassKey =
   | 'icon'
   ;
 
-declare const BottomNavigationButton: StyledComponent<BottomNavigationButtonProps, BottomNavigationButtonClassKey>;
+declare const BottomNavigationButton: React.ComponentType<BottomNavigationButtonProps>;
 
 export default BottomNavigationButton;

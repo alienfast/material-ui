@@ -1,3 +1,7 @@
+---
+filename: /src/Tabs/Tabs.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # Tabs
@@ -5,13 +9,15 @@
 Notice that this Component is incompatible with server side rendering.
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
+| TabScrollButton | ComponentType | TabScrollButton | The component used to render the scroll buttons. |
 | buttonClassName | string |  | The CSS class name of the scroll button elements. |
 | centered | boolean | false | If `true`, the tabs will be centered. This property is intended for large views. |
 | children | Node |  | The content of the component. |
 | classes | Object |  | Useful to extend the style applied to components. |
-| fullWidth | boolean | false | If `true`, the tabs will grow to use all the available space. This property is intended for small views. |
+| fullWidth | boolean | false | If `true`, the tabs will grow to use all the available space. This property is intended for small views, like on mobile. |
 | indicatorClassName | string |  | The CSS class name of the indicator element. |
 | indicatorColor | union:&nbsp;'accent'<br>&nbsp;'primary'<br>&nbsp;string<br> | 'accent' | Determines the color of the indicator. |
 | <span style="color: #31a148">onChange *</span> | Function |  | Callback fired when the value changes.<br><br>**Signature:**<br>`function(event: object, value: number) => void`<br>*event:* The event source of the callback<br>*value:* We default to the index of the child |
@@ -34,8 +40,9 @@ This property accepts the following keys:
 - `centered`
 - `buttonAuto`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/Tabs/Tabs.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),

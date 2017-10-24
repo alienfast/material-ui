@@ -1,3 +1,7 @@
+---
+filename: /src/BottomNavigation/BottomNavigationButton.js
+---
+
 <!--- This documentation is automatically generated, do not try to edit it. -->
 
 # BottomNavigationButton
@@ -5,11 +9,12 @@
 
 
 ## Props
+
 | Name | Type | Default | Description |
 |:-----|:-----|:--------|:------------|
 | classes | Object |  | Useful to extend the style applied to components. |
 | icon | union:&nbsp;string<br>&nbsp;Element<any><br> |  | The icon element. If a string is provided, it will be used as a font ligature. |
-| label | union:&nbsp;string<br>&nbsp;Element<any><br> |  | The label element. |
+| label | Node |  | The label element. |
 | showLabel | boolean |  | If `true`, the BottomNavigationButton will show its label. |
 | value | any |  | You can provide your own value. Otherwise, we fallback to the child position index. |
 
@@ -28,8 +33,9 @@ This property accepts the following keys:
 - `hiddenLabel`
 - `icon`
 
-Have a look at [overriding with classes](/customization/overrides#overriding-with-classes)
-section for more detail.
+Have a look at [overriding with classes](/customization/overrides#overriding-with-classes) section
+and the [implementation of the component](https://github.com/callemall/material-ui/tree/v1-beta/src/BottomNavigation/BottomNavigationButton.js)
+for more detail.
 
 If using the `overrides` key of the theme as documented
 [here](/customization/themes#customizing-all-instances-of-a-component-type),
