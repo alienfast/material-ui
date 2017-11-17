@@ -46,14 +46,30 @@ export const styles = (theme: Object) => ({
   },
 });
 
+type IndicatorColor = 'accent' | 'primary' | string;
+type ScrollButtons = 'auto' | 'on' | 'off';
+type TextColor = 'accent' | 'primary' | 'inherit';
+
 type ProvidedProps = {
   classes: Object,
-  indicatorColor: string,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  centered?: boolean,
+  fullWidth?: boolean,
+  indicatorColor: IndicatorColor,
+  scrollable?: boolean,
+  scrollButtons?: ScrollButtons,
+  textColor?: TextColor,
   TabScrollButton: ComponentType<*>,
-  theme: Object,
 };
 
 export type Props = {
+  /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
   /**
    * The CSS class name of the scroll button elements.
    */
@@ -87,7 +103,7 @@ export type Props = {
   /**
    * Determines the color of the indicator.
    */
-  indicatorColor?: 'accent' | 'primary' | string,
+  indicatorColor: 'accent' | 'primary' | string,
   /**
    * Callback fired when the value changes.
    *
@@ -106,15 +122,15 @@ export type Props = {
    * `on` will always present them
    * `off` will never present them
    */
-  scrollButtons?: 'auto' | 'on' | 'off',
+  scrollButtons?: ScrollButtons,
   /**
    * The component used to render the scroll buttons.
    */
-  TabScrollButton?: ComponentType<*>,
+  TabScrollButton: ComponentType<*>,
   /**
    * Determines the color of the `Tab`.
    */
-  textColor?: 'accent' | 'primary' | 'inherit',
+  textColor?: TextColor,
   /**
    * @ignore
    */
@@ -144,11 +160,8 @@ export type TabsMeta = {
   right: number,
 };
 
-/**
- * Notice that this Component is incompatible with server side rendering.
- */
 class Tabs extends React.Component<ProvidedProps & Props, State> {
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     centered: false,
     fullWidth: false,
     indicatorColor: 'accent',
@@ -180,10 +193,13 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
 
   componentDidUpdate(prevProps, prevState) {
     this.updateScrollButtonState();
+
+    // The index might have changed at the same time.
+    // We need to check again the right indicator position.
+    this.updateIndicatorState(this.props);
+
     if (this.state.indicatorStyle !== prevState.indicatorStyle) {
       this.scrollSelectedIntoView();
-    } else {
-      this.updateIndicatorState(this.props);
     }
   }
 
@@ -191,38 +207,6 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
     this.handleResize.cancel();
     this.handleTabsScroll.cancel();
   }
-
-  tabs: ?HTMLElement = undefined;
-  valueToIndex: { [key: any]: any } = {};
-
-  handleResize = debounce(() => {
-    this.updateIndicatorState(this.props);
-    this.updateScrollButtonState();
-  }, 166);
-
-  handleLeftScrollClick = () => {
-    if (this.tabs) {
-      this.moveTabsScroll(-this.tabs.clientWidth);
-    }
-  };
-
-  handleRightScrollClick = () => {
-    if (this.tabs) {
-      this.moveTabsScroll(this.tabs.clientWidth);
-    }
-  };
-
-  handleScrollbarSizeChange = ({ scrollbarHeight }) => {
-    this.setState({
-      scrollerStyle: {
-        marginBottom: -scrollbarHeight,
-      },
-    });
-  };
-
-  handleTabsScroll = debounce(() => {
-    this.updateScrollButtonState();
-  }, 166);
 
   getConditionalElements = () => {
     const {
@@ -245,7 +229,7 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
 
     conditionalElements.scrollButtonLeft = showScrollButtons ? (
       <TabScrollButtonProp
-        direction={theme.direction === 'rtl' ? 'right' : 'left'}
+        direction={theme && theme.direction === 'rtl' ? 'right' : 'left'}
         onClick={this.handleLeftScrollClick}
         visible={this.state.showLeftScroll}
         className={classNames(
@@ -259,7 +243,7 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
 
     conditionalElements.scrollButtonRight = showScrollButtons ? (
       <TabScrollButtonProp
-        direction={theme.direction === 'rtl' ? 'left' : 'right'}
+        direction={theme && theme.direction === 'rtl' ? 'left' : 'right'}
         onClick={this.handleRightScrollClick}
         visible={this.state.showRightScroll}
         className={classNames(
@@ -295,21 +279,54 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
 
       if (children.length > 0) {
         const tab = children[this.valueToIndex[value]];
-        warning(tab, `Material-UI: the value provided \`${value}\` is invalid`);
+        warning(Boolean(tab), `Material-UI: the value provided \`${value}\` is invalid`);
         tabMeta = tab ? tab.getBoundingClientRect() : null;
       }
     }
     return { tabsMeta, tabMeta };
   };
 
+  tabs: ?HTMLElement = undefined;
+  valueToIndex: { [key: any]: any } = {};
+
+  handleResize = debounce(() => {
+    this.updateIndicatorState(this.props);
+    this.updateScrollButtonState();
+  }, 166);
+
+  handleLeftScrollClick = () => {
+    if (this.tabs) {
+      this.moveTabsScroll(-this.tabs.clientWidth);
+    }
+  };
+
+  handleRightScrollClick = () => {
+    if (this.tabs) {
+      this.moveTabsScroll(this.tabs.clientWidth);
+    }
+  };
+
+  handleScrollbarSizeChange = ({ scrollbarHeight }) => {
+    this.setState({
+      scrollerStyle: {
+        marginBottom: -scrollbarHeight,
+      },
+    });
+  };
+
+  handleTabsScroll = debounce(() => {
+    this.updateScrollButtonState();
+  }, 166);
+
   moveTabsScroll = delta => {
     const { theme } = this.props;
 
     if (this.tabs) {
-      const multiplier = theme.direction === 'rtl' ? -1 : 1;
+      const themeDirection = theme && theme.direction;
+      const multiplier = themeDirection === 'rtl' ? -1 : 1;
       const nextScrollLeft = this.tabs.scrollLeft + delta * multiplier;
       // Fix for Edge
-      const invert = theme.direction === 'rtl' && detectScrollType() === 'reverse' ? -1 : 1;
+      const invert = themeDirection === 'rtl' && detectScrollType() === 'reverse' ? -1 : 1;
       scroll.left(this.tabs, invert * nextScrollLeft);
     }
   };
@@ -317,12 +334,13 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
   updateIndicatorState(props) {
     const { theme, value } = props;
 
-    const { tabsMeta, tabMeta } = this.getTabsMeta(value, theme.direction);
+    const themeDirection = theme && theme.direction;
+    const { tabsMeta, tabMeta } = this.getTabsMeta(value, themeDirection);
     let left = 0;
 
     if (tabMeta && tabsMeta) {
       const correction =
-        theme.direction === 'rtl'
+        themeDirection === 'rtl'
           ? tabsMeta.scrollLeftNormalized + tabsMeta.clientWidth - tabsMeta.scrollWidth
           : tabsMeta.scrollLeft;
       left = tabMeta.left - tabsMeta.left + correction;
@@ -335,8 +353,10 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
     };
 
     if (
-      indicatorStyle.left !== this.state.indicatorStyle.left ||
-      indicatorStyle.width !== this.state.indicatorStyle.width
+      (indicatorStyle.left !== this.state.indicatorStyle.left ||
+        indicatorStyle.width !== this.state.indicatorStyle.width) &&
+      !Number.isNaN(indicatorStyle.left) &&
+      !Number.isNaN(indicatorStyle.width)
     ) {
       this.setState({ indicatorStyle });
     }
@@ -345,7 +365,8 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
   scrollSelectedIntoView = () => {
     const { theme, value } = this.props;
 
-    const { tabsMeta, tabMeta } = this.getTabsMeta(value, theme.direction);
+    const themeDirection = theme && theme.direction;
+    const { tabsMeta, tabMeta } = this.getTabsMeta(value, themeDirection);
 
     if (!tabMeta || !tabsMeta) {
       return;
@@ -364,16 +385,17 @@ class Tabs extends React.Component<ProvidedProps & Props, State> {
 
   updateScrollButtonState = () => {
     const { scrollable, scrollButtons, theme } = this.props;
+    const themeDirection = theme && theme.direction;
 
     if (this.tabs && scrollable && scrollButtons !== 'off') {
       const { scrollWidth, clientWidth } = this.tabs;
-      const scrollLeft = getNormalizedScrollLeft(this.tabs, theme.direction);
+      const scrollLeft = getNormalizedScrollLeft(this.tabs, themeDirection);
 
       const showLeftScroll =
-        theme.direction === 'rtl' ? scrollWidth > clientWidth + scrollLeft : scrollLeft > 0;
+        themeDirection === 'rtl' ? scrollWidth > clientWidth + scrollLeft : scrollLeft > 0;
 
       const showRightScroll =
-        theme.direction === 'rtl' ? scrollLeft > 0 : scrollWidth > clientWidth + scrollLeft;
+        themeDirection === 'rtl' ? scrollLeft > 0 : scrollWidth > clientWidth + scrollLeft;
 
       if (
         showLeftScroll !== this.state.showLeftScroll ||

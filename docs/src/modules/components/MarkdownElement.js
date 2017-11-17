@@ -41,6 +41,10 @@ marked.setOptions({
         language = prism.languages.diff;
         break;
 
+      case 'css':
+        language = prism.languages.css;
+        break;
+
       case 'jsx':
       default:
         language = prism.languages.jsx;
@@ -52,30 +56,10 @@ marked.setOptions({
   renderer,
 });
 
-const anchorLinkStyle = (theme, size) => ({
-  '& .anchor-link-style': {
-    opacity: 0,
-    // To prevent the link to get the focus.
-    display: 'none',
-  },
-  '&:hover .anchor-link-style': {
-    display: 'inline-block',
-    opacity: 1,
-    padding: `0 ${theme.spacing.unit}px`,
-    color: theme.palette.text.hint,
-    '&:hover': {
-      color: theme.palette.text.secondary,
-    },
-    '& svg': {
-      width: size,
-      fill: 'currentColor',
-    },
-  },
-});
-
 const styles = theme => ({
   root: {
     fontFamily: theme.typography.fontFamily,
+    fontSize: 16,
     marginTop: theme.spacing.unit * 2,
     marginBottom: theme.spacing.unit * 2,
     padding: `0 ${theme.spacing.unit}px`,
@@ -104,36 +88,53 @@ const styles = theme => ({
       fontSize: 14,
       lineHeight: 1.6,
     },
-    '& h1 code, & h2 code, & h3 code, & h4 code': {
-      fontSize: 'inherit',
-      lineHeight: 'inherit',
-    },
     '& h1': {
       ...theme.typography.display2,
       color: theme.palette.text.secondary,
       margin: '0.7em 0',
-      ...anchorLinkStyle(theme, 20),
     },
     '& h2': {
       ...theme.typography.display1,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme, 18),
     },
     '& h3': {
       ...theme.typography.headline,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme, 16),
     },
     '& h4': {
       ...theme.typography.title,
       color: theme.palette.text.secondary,
       margin: '1em 0 0.7em',
-      ...anchorLinkStyle(theme, 14),
     },
     '& p, & ul, & ol': {
       lineHeight: 1.6,
+    },
+    '& h1, & h2, & h3, & h4': {
+      '& code': {
+        fontSize: 'inherit',
+        lineHeight: 'inherit',
+      },
+      '& .anchor-link-style': {
+        opacity: 0,
+        // To prevent the link to get the focus.
+        display: 'none',
+      },
+      '&:hover .anchor-link-style': {
+        display: 'inline-block',
+        opacity: 1,
+        padding: `0 ${theme.spacing.unit}px`,
+        color: theme.palette.text.hint,
+        '&:hover': {
+          color: theme.palette.text.secondary,
+        },
+        '& svg': {
+          width: '0.55em',
+          height: '0.55em',
+          fill: 'currentColor',
+        },
+      },
     },
     '& table': {
       width: '100%',

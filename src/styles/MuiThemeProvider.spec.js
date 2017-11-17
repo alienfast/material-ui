@@ -5,11 +5,11 @@ import { assert } from 'chai';
 import React from 'react';
 import PropTypes from 'prop-types';
 import { create, SheetsRegistry } from 'jss';
-import preset from 'jss-preset-default';
 import JssProvider from 'react-jss/lib/JssProvider';
 import { renderToString } from 'react-dom/server';
 import { createMount } from '../test-utils';
-import { createMuiTheme } from '../styles';
+import createMuiTheme from './createMuiTheme';
+import { preset } from './withStyles';
 import Button from '../Button';
 import createGenerateClassName from './createGenerateClassName';
 import withTheme from './withTheme';
@@ -17,7 +17,7 @@ import MuiThemeProvider from './MuiThemeProvider';
 
 function getThemeSpy() {
   const themeSpy = spy();
-  const ThemeSpy = props => {
+  const ThemeSpy = (props: Object) => {
     themeSpy(props.theme);
     return props.children;
   };
@@ -92,7 +92,6 @@ describe('<MuiThemeProvider />', () => {
       assert.deepEqual(
         sheetsRegistry.registry[1].classes,
         {
-          '.MuiButtonBase-root-15::-moz-focus-inner': 'MuiButtonBase-root-15::-moz-focus-inner',
           disabled: 'MuiButtonBase-disabled-16',
           root: 'MuiButtonBase-root-15',
         },

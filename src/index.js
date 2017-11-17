@@ -9,12 +9,14 @@ export { default as ButtonBase } from './ButtonBase';
 export { default as Card, CardActions, CardContent, CardHeader, CardMedia } from './Card';
 export { default as Checkbox } from './Checkbox';
 export { default as Chip } from './Chip';
+export { default as ClickAwayListener } from './utils/ClickAwayListener';
 export {
   default as Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
+  withMobileDialog,
 } from './Dialog';
 export { default as Divider } from './Divider';
 export { default as Drawer } from './Drawer';
@@ -34,12 +36,14 @@ export {
   ListSubheader,
 } from './List';
 export { default as Menu, MenuItem, MenuList } from './Menu';
+export { default as Modal } from './Modal';
 export { default as Paper } from './Paper';
 export { default as Popover } from './Popover';
 export { CircularProgress, LinearProgress } from './Progress';
 export { default as Radio, RadioGroup } from './Radio';
 export { default as Select } from './Select';
 export { default as Snackbar, SnackbarContent } from './Snackbar';
+export { default as Stepper, Step, StepButton, StepContent, StepLabel } from './Stepper';
 export { MuiThemeProvider, withStyles, withTheme, createMuiTheme } from './styles';
 
 // eslint-disable-next-line import/first

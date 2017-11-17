@@ -11,6 +11,7 @@ const rowsHeight = 24;
 export const styles = {
   root: {
     position: 'relative', // because the shadow has position: 'absolute',
+    width: '100%',
   },
   textarea: {
     width: '100%',
@@ -40,9 +41,18 @@ export const styles = {
 
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  rows?: string | number,
 };
 
 export type Props = {
+  /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
   /**
    * Useful to extend the style applied to components.
    */
@@ -89,15 +99,7 @@ type State = {
  * @ignore - internal component.
  */
 class Textarea extends React.Component<ProvidedProps & Props, State> {
-  shadow: ?HTMLInputElement;
-
-  singlelineShadow: ?HTMLInputElement;
-
-  input: ?HTMLInputElement;
-
-  value: string | number;
-
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     rows: 1,
   };
 
@@ -130,6 +132,11 @@ class Textarea extends React.Component<ProvidedProps & Props, State> {
   componentWillUnmount() {
     this.handleResize.cancel();
   }
+
+  shadow: ?HTMLTextAreaElement;
+  singlelineShadow: ?HTMLTextAreaElement;
+  input: ?HTMLTextAreaElement;
+  value: string | number;
 
   handleResize = debounce(event => {
     this.syncHeightWithShadow(event);

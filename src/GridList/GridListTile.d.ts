@@ -1,9 +1,12 @@
 import * as React from 'react';
 import { StandardProps } from '..';
 
-export interface GridListTileProps extends StandardProps<{}, GridListTileClassKey> {
+export interface GridListTileProps extends StandardProps<
+  React.HTMLAttributes<HTMLLIElement>,
+  GridListTileClassKey
+> {
   cols?: number;
-  component?: React.ReactType;
+  component?: string | React.ComponentType<GridListTileProps>;
   rows?: number;
 }
 

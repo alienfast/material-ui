@@ -67,11 +67,19 @@ export function setTranslateValue(props: Object, node: HTMLElement | Object) {
 export type Direction = 'left' | 'right' | 'up' | 'down';
 
 type ProvidedProps = {
-  timeout: TransitionDuration,
   theme: Object,
 };
 
+type DefaultProps = {
+  direction?: Direction,
+  timeout: TransitionDuration,
+};
+
 export type Props = {
+  /**
+   * Other Transition element props.
+   */
+  [otherProp: string]: any,
   /**
    * A single child content element.
    */
@@ -79,7 +87,7 @@ export type Props = {
   /**
    * Direction the child node will enter from.
    */
-  direction?: Direction,
+  direction: Direction,
   /**
    * If `true`, show the component; triggers the enter or exit animation.
    */
@@ -116,7 +124,7 @@ export type Props = {
    * The duration for the transition, in milliseconds.
    * You may specify a single timeout for all transitions, or individually with an object.
    */
-  timeout?: TransitionDuration,
+  timeout: TransitionDuration,
   /**
    * @ignore
    */
@@ -130,8 +138,7 @@ type State = {
 const reflow = node => node.scrollTop;
 
 class Slide extends React.Component<ProvidedProps & Props, State> {
-  static defaultProps = {
-    direction: 'down',
+  static defaultProps: DefaultProps = {
     timeout: {
       enter: duration.enteringScreen,
       exit: duration.leavingScreen,
@@ -144,14 +151,12 @@ class Slide extends React.Component<ProvidedProps & Props, State> {
   };
 
   componentDidMount() {
+    // state.firstMount handle SSR, once the component is mounted, we need
+    // to properly hide it.
     if (!this.props.in) {
       // We need to set initial translate values of transition element
       // otherwise component will be shown when in=false.
-      const element = findDOMNode(this.transition);
-      if (element instanceof HTMLElement) {
-        element.style.visibility = 'visible';
-        setTranslateValue(this.props, element);
-      }
+      this.updatePosition();
     }
   }
 
@@ -161,12 +166,27 @@ class Slide extends React.Component<ProvidedProps & Props, State> {
     });
   }
 
+  componentDidUpdate(prevProps) {
+    if (prevProps.direction !== this.props.direction && !this.props.in) {
+      // We need to update the position of the drawer when the direction change and
+      // when it's hidden.
+      this.updatePosition();
+    }
+  }
+
   componentWillUnmount() {
     this.handleResize.cancel();
   }
 
   transition = null;
-  firstRender = false;
+
+  updatePosition() {
+    const element = findDOMNode(this.transition);
+    if (element instanceof HTMLElement) {
+      element.style.visibility = 'inherit';
+      setTranslateValue(this.props, element);
+    }
+  }
 
   handleResize = debounce(() => {
     // Skip configuration where the position is screen size invariant.
@@ -225,8 +245,28 @@ class Slide extends React.Component<ProvidedProps & Props, State> {
     }
   };
 
+  handleExited = (node: HTMLElement) => {
+    // No need for transitions when the component is hidden
+    node.style.transition = '';
+    // $FlowFixMe - https://github.com/facebook/flow/pull/5161
+    node.style.webkitTransition = '';
+
+    if (this.props.onExited) {
+      this.props.onExited(node);
+    }
+  };
+
   render() {
-    const { children, onEnter, onEntering, onExit, style: styleProp, theme, ...other } = this.props;
+    const {
+      children,
+      onEnter,
+      onEntering,
+      onExit,
+      onExited,
+      style: styleProp,
+      theme,
+      ...other
+    } = this.props;
 
     const style = { ...styleProp };
 
@@ -240,6 +280,7 @@ class Slide extends React.Component<ProvidedProps & Props, State> {
           onEnter={this.handleEnter}
           onEntering={this.handleEntering}
           onExit={this.handleExit}
+          onExited={this.handleExited}
           appear
           style={style}
           {...other}

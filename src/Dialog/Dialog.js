@@ -1,11 +1,12 @@
 // @flow
+// @inheritedComponent Modal
 
 import React from 'react';
-import type { ComponentType, Element, Node } from 'react';
+import type { ComponentType, Node } from 'react';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import { capitalizeFirstLetter } from '../utils/helpers';
-import Modal from '../internal/Modal';
+import Modal from '../Modal';
 import Fade from '../transitions/Fade';
 import { duration } from '../styles/transitions';
 import Paper from '../Paper';
@@ -23,12 +24,13 @@ export const styles = (theme: Object) => ({
     flex: '0 1 auto',
     position: 'relative',
     maxHeight: '90vh',
+    overflowY: 'auto', // Fix IE11 issue, to remove at some point.
     '&:focus': {
       outline: 'none',
     },
   },
   paperWidthXs: {
-    maxWidth: theme.breakpoints.values.xs,
+    maxWidth: Math.max(theme.breakpoints.values.xs, 360),
   },
   paperWidthSm: {
     maxWidth: theme.breakpoints.values.sm,
@@ -49,11 +51,29 @@ export const styles = (theme: Object) => ({
   },
 });
 
+type MaxWidth = 'xs' | 'sm' | 'md';
+
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  fullScreen?: boolean,
+  ignoreBackdropClick?: boolean,
+  ignoreEscapeKeyUp?: boolean,
+  transitionDuration?: TransitionDuration,
+  maxWidth?: MaxWidth,
+  fullWidth?: boolean,
+  open?: boolean,
+  transition: ComponentType<*>,
 };
 
 export type Props = {
+  /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
   /**
    * Dialog children, usually the included sub-components.
    */
@@ -89,7 +109,7 @@ export type Props = {
    * on the desktop where you might need some coherent different width size across your
    * application.
    */
-  maxWidth?: 'xs' | 'sm' | 'md',
+  maxWidth?: MaxWidth,
   /**
    * If specified, stretches dialog to max width.
    */
@@ -139,97 +159,93 @@ export type Props = {
   /**
    * Transition component.
    */
-  transition?: ComponentType<*> | Element<any>,
+  transition: ComponentType<*>,
 };
 
 /**
  * Dialogs are overlaid modal paper based components with a backdrop.
  */
-function Dialog(props: ProvidedProps & Props) {
-  const {
-    children,
-    classes,
-    className,
-    fullScreen,
-    ignoreBackdropClick,
-    ignoreEscapeKeyUp,
-    transitionDuration,
-    maxWidth,
-    fullWidth,
-    open,
-    onBackdropClick,
-    onEscapeKeyUp,
-    onEnter,
-    onEntering,
-    onEntered,
-    onExit,
-    onExiting,
-    onExited,
-    onRequestClose,
-    transition,
-    ...other
-  } = props;
+class Dialog extends React.Component<ProvidedProps & Props> {
+  static defaultProps: DefaultProps = {
+    fullScreen: false,
+    ignoreBackdropClick: false,
+    ignoreEscapeKeyUp: false,
+    transitionDuration: {
+      enter: duration.enteringScreen,
+      exit: duration.leavingScreen,
+    },
+    maxWidth: 'sm',
+    fullWidth: false,
+    open: false,
+    transition: Fade,
+  };
 
-  const createTransitionFn =
-    typeof transition === 'function' ? React.createElement : React.cloneElement;
+  render() {
+    const {
+      children,
+      classes,
+      className,
+      fullScreen,
+      ignoreBackdropClick,
+      ignoreEscapeKeyUp,
+      transitionDuration,
+      maxWidth,
+      fullWidth,
+      open,
+      onBackdropClick,
+      onEscapeKeyUp,
+      onEnter,
+      onEntering,
+      onEntered,
+      onExit,
+      onExiting,
+      onExited,
+      onRequestClose,
+      transition: TransitionProp,
+      ...other
+    } = this.props;
 
-  return (
-    <Modal
-      className={classNames(classes.root, className)}
-      BackdropTransitionDuration={transitionDuration}
-      ignoreBackdropClick={ignoreBackdropClick}
-      ignoreEscapeKeyUp={ignoreEscapeKeyUp}
-      onBackdropClick={onBackdropClick}
-      onEscapeKeyUp={onEscapeKeyUp}
-      onRequestClose={onRequestClose}
-      show={open}
-      {...other}
-    >
-      {createTransitionFn(
-        /* $FlowFixMe - FIXME See Snackbar for similar create vs clone example */
-        transition,
-        {
-          appear: true,
-          in: open,
-          timeout: transitionDuration,
-          onEnter,
-          onEntering,
-          onEntered,
-          onExit,
-          onExiting,
-          onExited,
-        },
-        <Paper
-          data-mui-test="Dialog"
-          elevation={24}
-          className={classNames(
-            classes.paper,
-            classes[`paperWidth${capitalizeFirstLetter(maxWidth)}`],
-            {
-              [classes.fullScreen]: fullScreen,
-              [classes.fullWidth]: fullWidth,
-            },
-          )}
+    return (
+      <Modal
+        className={classNames(classes.root, className)}
+        BackdropTransitionDuration={transitionDuration}
+        ignoreBackdropClick={ignoreBackdropClick}
+        ignoreEscapeKeyUp={ignoreEscapeKeyUp}
+        onBackdropClick={onBackdropClick}
+        onEscapeKeyUp={onEscapeKeyUp}
+        onRequestClose={onRequestClose}
+        show={open}
+        {...other}
+      >
+        <TransitionProp
+          appear
+          in={open}
+          timeout={transitionDuration}
+          onEnter={onEnter}
+          onEntering={onEntering}
+          onEntered={onEntered}
+          onExit={onExit}
+          onExiting={onExiting}
+          onExited={onExited}
         >
-          {children}
-        </Paper>,
-      )}
-    </Modal>
-  );
+          <Paper
+            data-mui-test="Dialog"
+            elevation={24}
+            className={classNames(
+              classes.paper,
+              classes[`paperWidth${capitalizeFirstLetter(maxWidth)}`],
+              {
+                [classes.fullScreen]: fullScreen,
+                [classes.fullWidth]: fullWidth,
+              },
+            )}
+          >
+            {children}
+          </Paper>
+        </TransitionProp>
+      </Modal>
+    );
+  }
 }
-
-Dialog.defaultProps = {
-  fullScreen: false,
-  ignoreBackdropClick: false,
-  ignoreEscapeKeyUp: false,
-  transitionDuration: {
-    enter: duration.enteringScreen,
-    exit: duration.leavingScreen,
-  },
-  maxWidth: 'sm',
-  fullWidth: false,
-  open: false,
-  transition: Fade,
-};
 
 export default withStyles(styles, { name: 'MuiDialog' })(Dialog);

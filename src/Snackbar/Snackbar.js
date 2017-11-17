@@ -6,7 +6,7 @@ import classNames from 'classnames';
 import EventListener from 'react-event-listener';
 import withStyles from '../styles/withStyles';
 import { duration } from '../styles/transitions';
-import ClickAwayListener from '../internal/ClickAwayListener';
+import ClickAwayListener from '../utils/ClickAwayListener';
 import { capitalizeFirstLetter, createChainedFunction } from '../utils/helpers';
 import Slide from '../transitions/Slide';
 import SnackbarContent from './SnackbarContent';
@@ -39,43 +39,51 @@ export const styles = (theme: Object) => {
       alignItems: 'center',
     },
     anchorTopCenter: {
-      extend: [top],
+      ...top,
       [theme.breakpoints.up('md')]: {
-        extend: [center],
+        ...center,
       },
     },
     anchorBottomCenter: {
-      extend: [bottom],
+      ...bottom,
       [theme.breakpoints.up('md')]: {
-        extend: [center],
+        ...center,
       },
     },
     anchorTopRight: {
-      extend: [top, right],
+      ...top,
+      ...right,
       [theme.breakpoints.up('md')]: {
         left: 'auto',
-        extend: [topSpace, rightSpace],
+        ...topSpace,
+        ...rightSpace,
       },
     },
     anchorBottomRight: {
-      extend: [bottom, right],
+      ...bottom,
+      ...right,
       [theme.breakpoints.up('md')]: {
         left: 'auto',
-        extend: [bottomSpace, rightSpace],
+        ...bottomSpace,
+        ...rightSpace,
       },
     },
     anchorTopLeft: {
-      extend: [top, left],
+      ...top,
+      ...left,
       [theme.breakpoints.up('md')]: {
         right: 'auto',
-        extend: [topSpace, leftSpace],
+        ...topSpace,
+        ...leftSpace,
       },
     },
     anchorBottomLeft: {
-      extend: [bottom, left],
+      ...bottom,
+      ...left,
       [theme.breakpoints.up('md')]: {
         right: 'auto',
-        extend: [bottomSpace, leftSpace],
+        ...bottomSpace,
+        ...leftSpace,
       },
     },
   };
@@ -87,8 +95,13 @@ export type Origin = {
 };
 
 type ProvidedProps = {
-  anchorOrigin: Origin,
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  anchorOrigin: Origin,
+  transitionDuration: TransitionDuration,
 };
 
 export type Props = {
@@ -99,7 +112,7 @@ export type Props = {
   /**
    * The anchor of the `Snackbar`.
    */
-  anchorOrigin?: Origin,
+  anchorOrigin: Origin,
   /**
    * The number of milliseconds to wait before automatically dismissing.
    * This behavior is disabled by default with the `null` value.
@@ -190,14 +203,14 @@ export type Props = {
    */
   SnackbarContentProps?: Object,
   /**
-   * Object with Transition component, props & create Fn.
+   * Transition component.
    */
-  transition?: ComponentType<*> | Element<any>,
+  transition?: ComponentType<*>,
   /**
    * The duration for the transition, in milliseconds.
    * You may specify a single timeout for all transitions, or individually with an object.
    */
-  transitionDuration?: TransitionDuration,
+  transitionDuration: TransitionDuration,
 };
 
 type State = {
@@ -205,7 +218,7 @@ type State = {
 };
 
 class Snackbar extends React.Component<ProvidedProps & Props, State> {
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     anchorOrigin: { vertical: 'bottom', horizontal: 'center' },
     transitionDuration: {
       enter: duration.enteringScreen,
@@ -250,23 +263,23 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
     clearTimeout(this.timerAutoHide);
   }
 
-  timerAutoHide = null;
-
   // Timer that controls delay before snackbar auto hides
   setAutoHideTimer(autoHideDuration = null) {
-    if (!this.props.onRequestClose || this.props.autoHideDuration === undefined) {
+    if (!this.props.onRequestClose || this.props.autoHideDuration == null) {
       return;
     }
 
     clearTimeout(this.timerAutoHide);
     this.timerAutoHide = setTimeout(() => {
-      if (!this.props.onRequestClose || this.props.autoHideDuration === undefined) {
+      if (!this.props.onRequestClose || this.props.autoHideDuration == null) {
         return;
       }
 
       this.props.onRequestClose(null, 'timeout');
     }, autoHideDuration || this.props.autoHideDuration || 0);
   }
+
+  timerAutoHide = null;
 
   handleMouseEnter = (event: SyntheticUIEvent<>) => {
     if (this.props.onMouseEnter) {
@@ -297,7 +310,7 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
   // Restart the timer when the user is no longer interacting with the Snackbar
   // or when the window is shown back.
   handleResume = () => {
-    if (this.props.autoHideDuration !== undefined) {
+    if (this.props.autoHideDuration != null) {
       if (this.props.resumeHideDuration !== undefined) {
         this.setAutoHideTimer(this.props.resumeHideDuration);
         return;
@@ -332,7 +345,7 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
       onRequestClose,
       open,
       SnackbarContentProps,
-      transition: transitionProp,
+      transition: TransitionProp,
       ...other
     } = this.props;
 
@@ -356,15 +369,13 @@ class Snackbar extends React.Component<ProvidedProps & Props, State> {
     );
 
     let transition;
-    if (typeof transitionProp === 'function') {
-      transition = React.createElement(transitionProp, transitionProps, transitionContent);
+    if (TransitionProp) {
+      transition = <TransitionProp {...transitionProps}>{transitionContent}</TransitionProp>;
     } else {
-      // $FlowFixMe - rosskevin - figure this out later
-      transition = React.cloneElement(
-        // $FlowFixMe - flow isn't smart enough to handle this pattern
-        transitionProp || <Slide direction={vertical === 'top' ? 'down' : 'up'} />,
-        transitionProps,
-        transitionContent,
+      transition = (
+        <Slide direction={vertical === 'top' ? 'down' : 'up'} {...transitionProps}>
+          {transitionContent}
+        </Slide>
       );
     }
 

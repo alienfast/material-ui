@@ -17,7 +17,7 @@ export const styles = (theme: Object) => {
   return {
     root: {
       fontFamily: theme.typography.fontFamily,
-      fontSize: 13,
+      fontSize: theme.typography.pxToRem(13),
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
@@ -55,7 +55,7 @@ export const styles = (theme: Object) => {
       marginRight: -4,
       width: 32,
       height: 32,
-      fontSize: 16,
+      fontSize: theme.typography.pxToRem(16),
     },
     avatarChildren: {
       width: 19,
@@ -86,17 +86,18 @@ export const styles = (theme: Object) => {
 
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
 };
 
 export type Props = {
   /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
+  /**
    * Avatar element.
    */
   avatar?: Element<typeof Avatar>,
-  /**
-   * Useful to extend the style applied to components.
-   */
-  classes?: Object,
   /**
    * @ignore
    */
@@ -132,6 +133,8 @@ export type Props = {
  * Chips represent complex entities in small blocks, such as a contact.
  */
 class Chip extends React.Component<ProvidedProps & Props> {
+  static defaultProps = {};
+
   chipRef: ?HTMLElement = null;
 
   handleDeleteIconClick = event => {
@@ -200,7 +203,6 @@ class Chip extends React.Component<ProvidedProps & Props> {
 
     let avatar = null;
     if (avatarProp && React.isValidElement(avatarProp)) {
-      // $FlowFixMe - this looks strictly correct, not sure why it errors.
       avatar = React.cloneElement(avatarProp, {
         className: classNames(classes.avatar, avatarProp.props.className),
         childrenClassName: classNames(classes.avatarChildren, avatarProp.props.childrenClassName),

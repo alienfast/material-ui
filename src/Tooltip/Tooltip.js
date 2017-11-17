@@ -1,9 +1,11 @@
-/* eslint-disable react/no-multi-comp */
+/* eslint-disable react/no-multi-comp, no-underscore-dangle */
 // @flow
 
 import React, { Children } from 'react';
 import type { Element, Node } from 'react';
 import { findDOMNode } from 'react-dom';
+import EventListener from 'react-event-listener';
+import debounce from 'lodash/debounce';
 import warning from 'warning';
 import classNames from 'classnames';
 import { Manager, Target, Popper } from 'react-popper';
@@ -35,7 +37,7 @@ export const styles = (theme: Object) => ({
     borderRadius: 2,
     color: common.fullWhite,
     fontFamily: theme.typography.fontFamily,
-    fontSize: 14,
+    fontSize: theme.typography.pxToRem(14),
     minHeight: theme.spacing.unit * 4,
     lineHeight: '32px',
     opacity: 0,
@@ -48,7 +50,7 @@ export const styles = (theme: Object) => ({
       minHeight: 22,
       lineHeight: '22px',
       padding: `0 ${theme.spacing.unit}px`,
-      fontSize: 10,
+      fontSize: theme.typography.pxToRem(10),
     },
   },
   tooltipLeft: {
@@ -116,13 +118,16 @@ function flipPlacement(placement: Placement): Placement {
 
 type ProvidedProps = {
   classes: Object,
-  disableTriggerFocus: boolean,
-  disableTriggerHover: boolean,
-  disableTriggerTouch: boolean,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  disableTriggerFocus?: boolean,
+  disableTriggerHover?: boolean,
+  disableTriggerTouch?: boolean,
   enterDelay: number,
-  leaveDelay: number,
+  leaveDelay?: number,
   placement: Placement,
-  theme: Object,
 };
 
 export type Props = {
@@ -151,8 +156,8 @@ export type Props = {
    */
   disableTriggerTouch?: boolean,
   /**
-   * The relationship between the tooltip and the wrapper componnet is not clear from the DOM.
-   * By providind this property, we can use aria-describedby to solve the accessibility issue.
+   * The relationship between the tooltip and the wrapper component is not clear from the DOM.
+   * By providing this property, we can use aria-describedby to solve the accessibility issue.
    */
   id?: string,
   /**
@@ -178,7 +183,7 @@ export type Props = {
   /**
    * The number of milliseconds to wait before showing the tooltip.
    */
-  enterDelay?: number,
+  enterDelay: number,
   /**
    * The number of milliseconds to wait before hidding the tooltip.
    */
@@ -186,7 +191,7 @@ export type Props = {
   /**
    * Tooltip placement
    */
-  placement?: Placement,
+  placement: Placement,
   /**
    * Properties applied to the `Popper` element.
    */
@@ -202,7 +207,7 @@ type State = {
 };
 
 class Tooltip extends React.Component<ProvidedProps & Props, State> {
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     disableTriggerFocus: false,
     disableTriggerHover: false,
     disableTriggerTouch: false,
@@ -226,16 +231,41 @@ class Tooltip extends React.Component<ProvidedProps & Props, State> {
     }
   }
 
+  componentDidMount() {
+    warning(
+      !this.children ||
+        !this.children.disabled ||
+        // $FlowFixMe
+        !this.children.tagName.toLowerCase() === 'button',
+      [
+        'Material-UI: you are providing a disabled button children to the Tooltip component.',
+        'A disabled element do not fire events.',
+        'But the Tooltip needs to listen to the children element events to display the title.',
+        '',
+        'Place a `div` over top of the element.',
+      ].join('\n'),
+    );
+  }
+
   componentWillUnmount() {
     clearTimeout(this.enterTimer);
     clearTimeout(this.leaveTimer);
+    this.handleResize.cancel();
   }
 
   enterTimer = null;
   leaveTimer = null;
   touchTimer = null;
   isControlled = null;
+  popper = null;
+  children = null;
   ignoreNonTouchEvents = false;
+
+  handleResize = debounce(() => {
+    if (this.popper) {
+      this.popper._popper.scheduleUpdate();
+    }
+  }, 166);
 
   handleRequestOpen = event => {
     const { children } = this.props;
@@ -368,7 +398,8 @@ class Tooltip extends React.Component<ProvidedProps & Props, State> {
       ...other
     } = this.props;
 
-    const placement = theme.direction === 'rtl' ? flipPlacement(rawPlacement) : rawPlacement;
+    const themeDirection = theme && theme.direction;
+    const placement = themeDirection === 'rtl' ? flipPlacement(rawPlacement) : rawPlacement;
     const open = this.isControlled ? openProp : this.state.open;
     const childrenProps = {};
 
@@ -400,41 +431,63 @@ class Tooltip extends React.Component<ProvidedProps & Props, State> {
     }
 
     return (
-      <Manager className={classNames(classes.root, className)} {...other}>
-        <Target>
-          {({ targetProps }) => (
-            <TargetChildren
-              element={
-                typeof childrenProp !== 'string'
-                  ? React.cloneElement(childrenProp, childrenProps)
-                  : childrenProp
-              }
-              ref={node => {
-                targetProps.ref(findDOMNode(node));
-              }}
-            />
-          )}
-        </Target>
-        <Popper
-          placement={placement}
-          eventsEnabled={open}
-          className={classNames(classes.popper, { [classes.popperClose]: !open }, PopperClassName)}
-          {...PopperOther}
-        >
-          <div
-            id={id}
-            role="tooltip"
-            aria-hidden={!open}
-            className={classNames(
-              classes.tooltip,
-              { [classes.tooltipOpen]: open },
-              classes[`tooltip${capitalizeFirstLetter(placement.split('-')[0])}`],
+      <EventListener target="window" onResize={this.handleResize}>
+        <Manager className={classNames(classes.root, className)} {...other}>
+          <Target>
+            {({ targetProps }) => (
+              <TargetChildren
+                element={
+                  typeof childrenProp !== 'string'
+                    ? React.cloneElement(childrenProp, childrenProps)
+                    : childrenProp
+                }
+                ref={node => {
+                  this.children = findDOMNode(node);
+                  targetProps.ref(this.children);
+                }}
+              />
             )}
+          </Target>
+          <Popper
+            placement={placement}
+            eventsEnabled={open}
+            className={classNames(
+              classes.popper,
+              { [classes.popperClose]: !open },
+              PopperClassName,
+            )}
+            {...PopperOther}
+            ref={node => {
+              this.popper = node;
+            }}
           >
-            {title}
-          </div>
-        </Popper>
-      </Manager>
+            {({ popperProps, restProps }) => (
+              <div
+                {...popperProps}
+                {...restProps}
+                style={{
+                  ...popperProps.style,
+                  left: popperProps.style.left || 0,
+                  ...restProps.style,
+                }}
+              >
+                <div
+                  id={id}
+                  role="tooltip"
+                  aria-hidden={!open}
+                  className={classNames(
+                    classes.tooltip,
+                    { [classes.tooltipOpen]: open },
+                    classes[`tooltip${capitalizeFirstLetter(placement.split('-')[0])}`],
+                  )}
+                >
+                  {title}
+                </div>
+              </div>
+            )}
+          </Popper>
+        </Manager>
+      </EventListener>
     );
   }
 }

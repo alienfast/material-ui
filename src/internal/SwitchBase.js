@@ -2,6 +2,7 @@
 
 import React from 'react';
 import type { Node, Element } from 'react';
+import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import withStyles from '../styles/withStyles';
 import IconButton from '../IconButton';
@@ -33,24 +34,35 @@ export const styles = {
 
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  checkedIcon: Node,
+  disableRipple: boolean,
+  icon: Node,
 };
 
 // NB: If changed, please update Checkbox, Switch and Radio
 // so that the API documentation is updated.
 export type Props = {
   /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
+  /**
    * If `true`, the component is checked.
    */
   checked?: boolean | string,
   /**
-   * The CSS class name of the root element when checked.
-   */
-  checkedClassName?: string,
-  /**
    * The icon to display when the component is checked.
    * If a string is provided, it will be used as a font ligature.
    */
-  checkedIcon?: Node,
+  checkedIcon: Node,
+  /**
+   * @ignore
+   */
+  children?: Node,
   /**
    * Useful to extend the style applied to components.
    */
@@ -68,18 +80,14 @@ export type Props = {
    */
   disabled?: boolean,
   /**
-   * The CSS class name of the root element when disabled.
-   */
-  disabledClassName?: string,
-  /**
    * If `true`, the ripple effect will be disabled.
    */
-  disableRipple?: boolean,
+  disableRipple: boolean,
   /**
    * The icon to display when the component is unchecked.
    * If a string is provided, it will be used as a font ligature.
    */
-  icon?: Node,
+  icon: Node,
   /**
    * If `true`, the component appears indeterminate.
    */
@@ -139,10 +147,14 @@ export default function createSwitch(
    * @ignore - internal component.
    */
   class SwitchBase extends React.Component<ProvidedProps & Props, State> {
-    static defaultProps = {
+    static defaultProps: DefaultProps = {
       checkedIcon: defaultCheckedIcon,
       disableRipple: false,
       icon: defaultIcon,
+    };
+
+    static contextTypes = {
+      muiFormControl: PropTypes.object,
     };
 
     state = {};
@@ -181,10 +193,8 @@ export default function createSwitch(
         checked: checkedProp,
         classes,
         className: classNameProp,
-        checkedClassName,
         checkedIcon,
-        disabled,
-        disabledClassName,
+        disabled: disabledProp,
         icon: iconProp,
         inputProps,
         inputRef,
@@ -195,10 +205,19 @@ export default function createSwitch(
         ...other
       } = this.props;
 
+      const { muiFormControl } = this.context;
+      let disabled = disabledProp;
+
+      if (muiFormControl) {
+        if (typeof disabled === 'undefined') {
+          disabled = muiFormControl.disabled;
+        }
+      }
+
       const checked = this.isControlled ? checkedProp : this.state.checked;
       const className = classNames(classes.root, classes.default, classNameProp, {
-        [classNames(classes.checked, checkedClassName)]: checked,
-        [classNames(classes.disabled, disabledClassName)]: disabled,
+        [classes.checked]: checked,
+        [classes.disabled]: disabled,
       });
 
       let icon = checked ? checkedIcon : iconProp;

@@ -6,6 +6,7 @@ import { spy, stub, useFakeTimers } from 'sinon';
 import css from 'dom-helpers/style';
 import { createShallow, createMount, getClasses } from '../test-utils';
 import Popover from './Popover';
+import mockPortal from '../../test/utils/mockPortal';
 
 describe('<Popover />', () => {
   let shallow;
@@ -23,10 +24,12 @@ describe('<Popover />', () => {
         <div />
       </Popover>,
     );
+    mockPortal.init();
   });
 
   after(() => {
     mount.cleanUp();
+    mockPortal.reset();
   });
 
   describe('root node', () => {
@@ -256,7 +259,7 @@ describe('<Popover />', () => {
   describe('transition lifecycle', () => {
     const element = {
       style: {
-        top: 'auto',
+        offsetTop: 'auto',
         left: 'auto',
         opacity: 1,
         transform: undefined,
@@ -408,6 +411,65 @@ describe('<Popover />', () => {
         const expectedTop = anchorRect.bottom <= 16 ? 16 : anchorRect.bottom;
         const expectedLeft = anchorRect.right <= 16 ? 16 : anchorRect.right;
         expectPopover(expectedTop, expectedLeft);
+      });
+    });
+  });
+
+  describe('positioning on a manual position', () => {
+    const anchorPosition = { top: 300, left: 500 };
+
+    let wrapper;
+    let popoverEl;
+    let openPopover;
+    let expectPopover;
+
+    before(() => {
+      openPopover = anchorOrigin => {
+        return new Promise(resolve => {
+          wrapper = mount(
+            <Popover
+              {...props}
+              anchorReference={'anchorPosition'}
+              anchorPosition={anchorPosition}
+              anchorOrigin={anchorOrigin}
+              transitionDuration={0}
+              onEntered={() => {
+                popoverEl = window.document.querySelector('[data-mui-test="Popover"]');
+                resolve();
+              }}
+            >
+              <div />
+            </Popover>,
+          );
+          wrapper.setProps({ open: true });
+        });
+      };
+
+      expectPopover = (top, left) => {
+        assert.strictEqual(
+          popoverEl.style.top,
+          `${top}px`,
+          'should position at the correct top offset',
+        );
+
+        assert.strictEqual(
+          popoverEl.style.left,
+          `${left}px`,
+          'should position at the correct left offset',
+        );
+        wrapper.unmount();
+      };
+    });
+
+    it('should be positioned according to the passed coordinates', () => {
+      return openPopover().then(() => {
+        expectPopover(anchorPosition.top, anchorPosition.left);
+      });
+    });
+
+    it('should ignore the anchorOrigin prop when being positioned', () => {
+      return openPopover({ vertical: 'top', horizontal: 'right' }).then(() => {
+        expectPopover(anchorPosition.top, anchorPosition.left);
       });
     });
   });

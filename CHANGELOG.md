@@ -2,6 +2,228 @@
 
 Changes. Changes everywhere!
 
+## 1.0.0-beta.21
+###### _Nov 13, 2017_
+
+Big thanks to the 18 contributors who made this release possible.
+
+Here are some highlights ✨:
+- @alexhayes and @vladimirpekez have done an awesome job migrating the Stepper component
+to the `v1-beta` branch (#8291). Thank you!
+- @kof Has been working hard and tightly with us to improve JSS, we have upgraded the dependency to v9 (#9111)
+- And many more bug fixes and documentation improvements.
+
+### Breaking change
+
+- [SwitchBase] Remove legacy properties (#9021) @oliviertassinari
+
+In the following diff `SwitchBase` can be a `Checkbox` a `Radio` or a `Switch`.
+
+```diff
+-<SwitchBase disabled disabledClassName={disabledClassName} />;
++<SwitchBase disabled classes={{ disabled: disabledClassName }} />;
+```
+
+#### Component Fixes / Enhancements
+
+- [InputLabel] Fix transformOrigin when direction=rtl (#9007) @alitaheri
+- [BottomNavigation] Allow null bottom navigation items (#9011) @ciroja
+- [Button] Include lineHeight in default theme button style (#9018) @mkornblum
+- [Select] Fix native width display (#8998) @oliviertassinari
+- [Modal] Expose the component to the public API (#9038) @oliviertassinari
+- [Drawer] Better support different anchor values (#9000) @oliviertassinari
+- [IconButton] Add missing TypeScript definition (#9016) @oliviertassinari
+- [List] Fix accessibility (#9017) @oliviertassinari
+- [ButtonBase] Restore the original keyboardFocusCheckTime value (#9019) @oliviertassinari
+- [Popover] Implement ability to pass coordinates as anchor (#9004) @jackyho112
+- [TextField] Fix undefined blur event (#9042) @nareshbhatia
+- [Slide] Support dynamic anchor (#9055) @oliviertassinari
+- [Input] Remove grey highlight on iOS (#9057) @oliviertassinari
+- [Grid] Add missing wrap-reverse classname (#9076) @dehli
+- [breakpoint] Fix xs value (#9078) @oliviertassinari
+- [TablePagination] Fix IE11 colSpan issue (#9086) @sakulstra
+- [Menu] Fix MenuList integration demo (#9088)
+- [Snackbar] Treat null properly and add a test for it (#9094) @leMaik
+- [Input] Fix inputProps.ref support (#9095) @oliviertassinari
+- [Slide] Refactor lifecycle logics (#9096) @alitaheri
+- [Stepper] First port of the component (#8291) @alexhayes @vladimirpekez
+- [InputLabel] Add missing FormControlClasses (#9110) @svachmic
+
+#### Docs
+
+- [docs] Fix escape in the API section (#9015) @oliviertassinari
+- [examples] Fix flow example (bdf5b6600fd82d2c5b64896994457001dac72104) @oliviertassinari
+- [examples] Fix missing props for BaseComponent (#9077) @aislanmaia
+- [docs] Add a AppBar/Menu integration example (#9067) @Tevinthuku
+- [docs] Add composed withStyles & withTheme HOCs to the FAQ (#9079) @mbrookes
+- [docs] Add file upload examples with the icon buttons (#9087) @Tevinthuku
+- [docs] Fix word (#9091) @Hissvard
+- [docs] Fix AppSearch horizontal rythm (#9107) @mbrookes
+- [docs] Fix misc typos, grammar and add minor clarifications (#9112) @mbrookes
+
+#### Core
+
+- [typescript] Conform Typography definition with React CSSProperties (#9023) @dewey92
+- [Modal] 100% coverage for modalManager.js (#9022) @oliviertassinari
+- [core] Upgrade dependencies (#9010) @oliviertassinari
+- [core] Upgrade flow-react-proptypes (#9029) @oliviertassinari
+- [typescript] Specify props type for overriding components (#9035) @pelotom
+- [core] Document the overhead of importing a single component (#9099) @oliviertassinari
+- [typescript] Fix screenWidth type and added is WidthDown (#9114) @stunaz
+- [core] Upgrade jss (#9111) @oliviertassinari
+- [core] Upgrade some dependencies (#9121) @oliviertassinari
+
+## 1.0.0-beta.20
+###### _Nov 5, 2017_
+
+Big thanks to the 12 contributors who made this release possible.
+
+Here are some highlights ✨:
+- We have been addressing a lot of bug and documentation issues during the last month.
+We should soon be able to start porting new components.
+- The test coverage increased by 0.5% thanks to @leMaik effort (#8910, #8911).
+We are very close to 100%.
+- The internal `ClickAwayListener` component was made public (#8967)
+
+### Breaking change
+
+- [style] Improve the font-size situation (#8942) @oliviertassinari
+The `Input` and `FormLabel` component do no longer inherit the font-size. You might have to override them explicitly.
+- [Popover] Add a max-height (#8943) @oliviertassinari
+```diff
+-Menu.classes.root
++Menu.classes.paper
+```
+- [Dialog] Rename withResponsiveFullScreen (#8951) @oliviertassinari
+```diff
+-import { withResponsiveFullScreen } from 'material-ui/Dialog';
++import { withMobileDialog } from 'material-ui/Dialog';
+```
+
+#### Component Fixes / Enhancements
+
+- [MenuList] Increase test coverage and fix an exception in an edge case (#8911) @leMaik
+- [Input] Fix textarea width (#8921) @istarkov
+- [SwitchBase] Inherit `disabled` from FormControl (#8917) @nllarson
+- [Popover] Improve the warning message (#8948) @oliviertassinari
+- [Popover] Add max-width (#8992) @oliviertassinari
+- [InputAdornment] Correct typescript export (#8959) @minajevs
+- [utils] Make ClickAwayListener public (#8967) @oliviertassinari
+- [Slider] Add the logic back (#8972) @oliviertassinari
+- [Select] Remove IE11 arrow (#8976) @oliviertassinari
+- [Select] Menu Items centered in IE 11 (#8982) @lukePeavey
+- [Select] Fix width on Safari (#8985) @oliviertassinari
+- [IconButton] Add buttonRef property (#8986) @oliviertassinari
+- [Grid] Document a limitation (#8987) @oliviertassinari
+- [Tooltip] New warning message (#8988) @oliviertassinari
+
+#### Docs
+
+- [docs] Split support content of CONTRIBUTING.md into SUPPORT.md (#8918) @mbrookes
+- [docs] Add demo for buttons with label and icon (#8922) @wongjiahau
+- [docs] Fix broken link (#8934) @cantsdmr
+- [docs] Fork JssProvider to release the docs (#8929) @oliviertassinari
+- [docs] Add more information around the MenuList component (#8947) @oliviertassinari
+- [docs] Add --save parameter (#8961) @Phoqe
+- [docs] Add guideline for docs/demo contribution (#8953) @wongjiahau
+- [docs] Use onChange instead of onClick for switch-like examples (#8971) @pelotom
+- [docs] Fix flow example (#8968) @oliviertassinari
+- [docs] Use next tag for the npm version badge (#8989) @leMaik
+- [docs] Add a JssProvider and CSS injection order section (#8993) @oliviertassinari
+
+#### Core
+
+- [core] Upgrade some dependencies (#8977) @oliviertassinari
+- [typescript] Add missing base props (#8931) @pelotom
+- [typescript] Add missing base props, continued (#8955) @pelotom
+- [typescript] Upgrade and resolve @types/react to 16.0.19 (#8956) @pelotom
+
+## 1.0.0-beta.19
+###### _Oct 30, 2017_
+
+Big thanks to the 17 contributors who made this release possible.
+
+Here are some highlights ✨:
+- We managed to do it! We have upgraded all the dependencies to react@16 🚀. (#8889)
+  We will keep react@15 support for some time in order to help the migration from v0.x to v1.x.
+- We have fixed an important bug of `withStyles()` with react-hot-loader.
+  Thanks a lot @rrousselGit for the support. (#8897)
+- We have introduced 3 soft breaking changes. (#8830, #8858, #8916)
+- And many more bug fixes and documentation improvements.
+
+### Breaking change
+
+- [transition] Improve interoperability with react-transition-group (#8830) @oliviertassinari
+```diff
+         <Grow
+-          transitionDuration={{
++          timeout={{
+             enter: enterDuration,
+             exit: leaveDuration,
+           }}
+         />
+```
+
+- [transition] Allow more accurate PropTypes (#8858) @apieceofbart
+```diff
+-    <Dialog transition={<Slide direction="left" />} />;
++    const Transition = props => <Slide direction="left" {...props} />
++    <Dialog transition={Transition} />;
+
+-    <Snackbar transition={<Slide direction="left" />} />;
++    const Transition = props => <Slide direction="left" {...props} />
++    <Snackbar transition={Transition} />;
+```
+
+- [RTL] Make Right-to-left optional (#8916) @oliviertassinari
+`jss-rtl` needs to be installed and added to jss by the users.  We do no longer do it by default.
+
+#### Component Fixes / Enhancements
+
+- [Popover] Add a marginThreshold property (#8815) @eyn
+- [Tabs] Fix consecutive updates (#8831) @oliviertassinari
+- [TextField] Support adornment full width (#8835) @oliviertassinari
+- [TextField] Fix dirty state update (#8879) @oliviertassinari
+- [breakpoints] Increase step to 5, fix media query matching on Safari (#8846) @dangh
+- [Input] Fix disabled state (#8848) @oliviertassinari
+- [Input] Fix inputProps overwriting className (#8867) @johnnynia
+- [Input] Ignore underline pointer events (#8885) @johnnynia
+- [Input] Made the labels for adorned elements not shrink on end adornment (#8882) @kf6kjg
+- [Popover] Warn when the height of the Popover is too tall (#8839) @amilagm
+- [Tooltip] Fix resize issue (#8862) @oliviertassinari
+- [CircularProgress] Add "inherit" color option (#8871) @dapetcu21
+- [Select] Fix array mutability flow annotation (#8870) @dapetcu21
+- [Dialog] Fix IE11 overflow bug (#8877) @sakulstra
+- [Menu] Add a PopoverClasses property (#8884) @johnnynia
+- [CircularProgress] Add thickness property to .t.ds file (#8888) @jportela
+- [Slider] Shouldn't be visible when in=false (#8894) @oliviertassinari
+- [Collapse] Fix height computation (#8895) @oliviertassinari
+- [withStyles] Better handle react-hot-loader (#8897) @oliviertassinari
+
+#### Docs
+
+- [docs] Fix wrong SSR path location (#8822) @lukePeavey
+- [docs] Fix some issues I have noticed (#8826) @oliviertassinari
+- [docs] Fix typos in input adornments example (#8836) @leMaik
+- [docs] Better onboarding experience (#8851) @oliviertassinari
+- [docs] Show disabled MenuItem (#8853) @ojathelonius
+- [docs] Fix Typos (#8860) @shtam
+- [docs] Update Popover component readme (#8865) @gregnb
+- [docs] Move the font link of CRA for codesandbox (f068f50187b2cc520d3af1276578d9ed951811b7) @oliviertassinari
+- [docs] Show how to change the color of the TextField (#8880) @oliviertassinari
+- [docs] Simpler IconMenu example (#8892) @oliviertassinari
+- [docs] Temporary fix for SSR issue with Portal (#8907) @oliviertassinari
+
+#### Core
+
+- [flow] Add config lint (#8834) @rosskevin
+- [core] Upgrade the dependencies (#8852) @oliviertassinari
+- [core] Fix missing typings in /es folder (#8887) @NeoLegends
+- [core] Upgrade to react@16 (#8889) @oliviertassinari
+- [core] Upgrade size-limit (#8899) @oliviertassinari
+- [Table] Increase test coverage (#8910) @leMaik
+- [test] Increase test coverage (#8908) @oliviertassinari
+
 ## 1.0.0-beta.18
 ###### _Oct 24, 2017_
 

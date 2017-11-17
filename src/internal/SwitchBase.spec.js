@@ -134,7 +134,7 @@ describe('<SwitchBase />', () => {
 
   it('should apply the custom disabled className when disabled', () => {
     const disabledClassName = 'foo';
-    const wrapperA = shallow(<SwitchBase disabled disabledClassName={disabledClassName} />);
+    const wrapperA = shallow(<SwitchBase disabled classes={{ disabled: disabledClassName }} />);
 
     assert.strictEqual(
       wrapperA.hasClass(disabledClassName),
@@ -158,9 +158,10 @@ describe('<SwitchBase />', () => {
     beforeEach(() => {
       wrapper = mount(
         <SwitchBaseNaked
-          classes={{}}
+          classes={{
+            checked: 'test-class-checked',
+          }}
           className="test-class"
-          checkedClassName="test-class-checked"
           checked={false}
         />,
       );
@@ -193,9 +194,10 @@ describe('<SwitchBase />', () => {
     beforeEach(() => {
       wrapper = mount(
         <SwitchBaseNaked
-          classes={{}}
+          classes={{
+            checked: 'test-class-checked',
+          }}
           className="test-class"
-          checkedClassName="test-class-checked"
         />,
       );
     });
@@ -319,6 +321,52 @@ describe('<SwitchBase />', () => {
       it('should be able to add aria', () => {
         const wrapper2 = shallow(<SwitchBase inputProps={{ 'aria-label': 'foo' }} />);
         assert.strictEqual(wrapper2.find('input').props()['aria-label'], 'foo');
+      });
+    });
+  });
+
+  describe('with muiFormControl context', () => {
+    let wrapper;
+    let muiFormControl;
+
+    function setFormControlContext(muiFormControlContext) {
+      muiFormControl = muiFormControlContext;
+      wrapper.setContext({ ...wrapper.context(), muiFormControl });
+    }
+
+    beforeEach(() => {
+      wrapper = shallow(<SwitchBase />);
+    });
+
+    describe('enabled', () => {
+      beforeEach(() => {
+        setFormControlContext({});
+      });
+
+      it('should not have the disabled class', () => {
+        assert.strictEqual(wrapper.hasClass(classes.disabled), false);
+      });
+
+      it('should be overridden by props', () => {
+        assert.strictEqual(wrapper.hasClass(classes.disabled), false);
+        wrapper.setProps({ disabled: true });
+        assert.strictEqual(wrapper.hasClass(classes.disabled), true);
+      });
+    });
+
+    describe('disabled', () => {
+      beforeEach(() => {
+        setFormControlContext({ disabled: true });
+      });
+
+      it('should have the disabled class', () => {
+        assert.strictEqual(wrapper.hasClass(classes.disabled), true);
+      });
+
+      it('should honor props', () => {
+        assert.strictEqual(wrapper.hasClass(classes.disabled), true);
+        wrapper.setProps({ disabled: false });
+        assert.strictEqual(wrapper.hasClass(classes.disabled), false);
       });
     });
   });

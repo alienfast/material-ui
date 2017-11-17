@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 // @flow
 
 import React from 'react';
@@ -5,17 +6,33 @@ import { assert } from 'chai';
 import { spy, useFakeTimers } from 'sinon';
 import { Target, Popper } from 'react-popper';
 import { ShallowWrapper } from 'enzyme';
-import { createShallow, createMount, getClasses } from '../test-utils';
+import { createShallow, createMount, getClasses, unwrap } from '../test-utils';
+import consoleErrorMock from '../../test/utils/consoleErrorMock';
 import createMuiTheme from '../styles/createMuiTheme';
 import Tooltip from './Tooltip';
 
-function getChildren(wrapper) {
+const TooltipNaked = unwrap(Tooltip);
+
+// eslint-disable-next-line react/prop-types
+const Hack = ({ style, innerRef, ...other }) => <div ref={innerRef} {...other} />;
+
+function getTargetChildren(wrapper) {
   return new ShallowWrapper(
     wrapper
       .find(Target)
       .props()
       .children({}).props.element,
     wrapper,
+  );
+}
+
+function getPopperChildren(wrapper) {
+  return new ShallowWrapper(
+    wrapper
+      .find(Popper)
+      .props()
+      .children({ popperProps: { style: {} }, restProps: {} }),
+    null,
   );
 }
 
@@ -44,7 +61,8 @@ describe('<Tooltip />', () => {
         <span>Hello World</span>
       </Tooltip>,
     );
-    assert.strictEqual(wrapper.name(), 'Manager');
+    assert.strictEqual(wrapper.name(), 'EventListener');
+    assert.strictEqual(wrapper.childAt(0).name(), 'Manager');
   });
 
   it('should render with the user, root and tooltip classes', () => {
@@ -53,15 +71,11 @@ describe('<Tooltip />', () => {
         <span>Hello World</span>
       </Tooltip>,
     );
-    assert.strictEqual(wrapper.hasClass('woofTooltip'), true);
-    assert.strictEqual(wrapper.hasClass(classes.root), true);
-    assert.strictEqual(
-      wrapper
-        .find(Popper)
-        .childAt(0)
-        .hasClass(classes.tooltip),
-      true,
-    );
+    assert.strictEqual(wrapper.childAt(0).hasClass('woofTooltip'), true);
+    assert.strictEqual(wrapper.childAt(0).hasClass(classes.root), true);
+
+    const popperChildren = getPopperChildren(wrapper);
+    assert.strictEqual(popperChildren.childAt(0).hasClass(classes.tooltip), true);
   });
 
   describe('prop: placement', () => {
@@ -71,22 +85,11 @@ describe('<Tooltip />', () => {
           <span>Hello World</span>
         </Tooltip>,
       );
-      assert.strictEqual(wrapper.hasClass(classes.root), true);
-      assert.strictEqual(
-        wrapper
-          .find(Popper)
-          .childAt(0)
-          .hasClass(classes.tooltip),
-        true,
-      );
+      assert.strictEqual(wrapper.childAt(0).hasClass(classes.root), true);
+      const popperChildren = getPopperChildren(wrapper);
+      assert.strictEqual(popperChildren.childAt(0).hasClass(classes.tooltip), true);
       wrapper.childAt(0).simulate('click');
-      assert.strictEqual(
-        wrapper
-          .find(Popper)
-          .childAt(0)
-          .hasClass(classes.tooltipTop),
-        true,
-      );
+      assert.strictEqual(popperChildren.childAt(0).hasClass(classes.tooltipTop), true);
     });
 
     const theme = createMuiTheme({
@@ -132,7 +135,7 @@ describe('<Tooltip />', () => {
         <button>Hello World</button>
       </Tooltip>,
     );
-    const children = getChildren(wrapper);
+    const children = getTargetChildren(wrapper);
     assert.strictEqual(wrapper.state().open, false);
     children.simulate('mouseOver', {});
     assert.strictEqual(wrapper.state().open, true);
@@ -155,7 +158,7 @@ describe('<Tooltip />', () => {
         <button>Hello World</button>
       </Tooltip>,
     );
-    const children = getChildren(wrapper);
+    const children = getTargetChildren(wrapper);
     assert.strictEqual(handleRequestOpen.callCount, 0);
     assert.strictEqual(handleRequestClose.callCount, 0);
     children.simulate('mouseOver', { type: 'mouseover' });
@@ -183,7 +186,7 @@ describe('<Tooltip />', () => {
           <button>Hello World</button>
         </Tooltip>,
       );
-      const children = getChildren(wrapper);
+      const children = getTargetChildren(wrapper);
       children.simulate('touchStart', { type: 'touchstart', persist: () => {} });
       children.simulate('touchEnd', { type: 'touchend', persist: () => {} });
       children.simulate('focus', { type: 'focus' });
@@ -197,7 +200,7 @@ describe('<Tooltip />', () => {
           <button>Hello World</button>
         </Tooltip>,
       );
-      const children = getChildren(wrapper);
+      const children = getTargetChildren(wrapper);
       children.simulate('touchStart', { type: 'touchstart', persist: () => {} });
       children.simulate('focus', { type: 'focus' });
       children.simulate('mouseover', { type: 'mouseover' });
@@ -211,9 +214,6 @@ describe('<Tooltip />', () => {
 
   describe('mount', () => {
     it('should mount without any issue', () => {
-      // eslint-disable-next-line react/prop-types
-      const Hack = ({ style, innerRef, ...other }) => <div ref={innerRef} {...other} />;
-
       mount(
         <Tooltip title="Hello World" PopperProps={{ component: Hack }}>
           <button>Hello World</button>
@@ -239,7 +239,7 @@ describe('<Tooltip />', () => {
           <button>Hello World</button>
         </Tooltip>,
       );
-      const children = getChildren(wrapper);
+      const children = getTargetChildren(wrapper);
       children.simulate('focus', { type: 'focus' });
       assert.strictEqual(wrapper.state().open, false);
       clock.tick(111);
@@ -252,7 +252,7 @@ describe('<Tooltip />', () => {
           <button>Hello World</button>
         </Tooltip>,
       );
-      const children = getChildren(wrapper);
+      const children = getTargetChildren(wrapper);
       children.simulate('focus', { type: 'focus' });
       assert.strictEqual(wrapper.state().open, true);
       children.simulate('blur', { type: 'blur' });
@@ -263,26 +263,70 @@ describe('<Tooltip />', () => {
   });
 
   describe('prop: overrides', () => {
-    [
-      'onTouchStart',
-      'onTouchEnd',
-      'onMouseOver',
-      'onMouseLeave',
-      'onFocus',
-      'onBlur',
-    ].forEach(name => {
-      it(`should be transparent for the ${name} event`, () => {
-        const handler = spy();
-        const wrapper = shallow(
-          <Tooltip title="Hello World">
-            <button {...{ [name]: handler }}>Hello World</button>
-          </Tooltip>,
-        );
-        const children = getChildren(wrapper);
-        const type = name.slice(2).toLowerCase();
-        children.simulate(type, { type, persist: () => {} });
-        assert.strictEqual(handler.callCount, 1);
-      });
+    ['onTouchStart', 'onTouchEnd', 'onMouseOver', 'onMouseLeave', 'onFocus', 'onBlur'].forEach(
+      name => {
+        it(`should be transparent for the ${name} event`, () => {
+          const handler = spy();
+          const wrapper = shallow(
+            <Tooltip title="Hello World">
+              <button {...{ [name]: handler }}>Hello World</button>
+            </Tooltip>,
+          );
+          const children = getTargetChildren(wrapper);
+          const type = name.slice(2).toLowerCase();
+          children.simulate(type, { type, persist: () => {} });
+          assert.strictEqual(handler.callCount, 1);
+        });
+      },
+    );
+  });
+
+  describe('resize', () => {
+    let clock;
+
+    before(() => {
+      clock = useFakeTimers();
+    });
+
+    after(() => {
+      clock.restore();
+    });
+
+    it('should recompute the correct position', () => {
+      const handleUpdate = spy();
+      const wrapper = mount(
+        <TooltipNaked theme={{}} classes={{}} PopperProps={{ component: Hack }}>
+          <div>Foo</div>
+        </TooltipNaked>,
+      );
+      const instance = wrapper.instance();
+      instance.popper._popper.scheduleUpdate = handleUpdate;
+      instance.handleResize();
+      clock.tick(166);
+      assert.strictEqual(handleUpdate.callCount, 1);
+    });
+  });
+
+  describe('disabled button warning', () => {
+    before(() => {
+      consoleErrorMock.spy();
+    });
+
+    after(() => {
+      consoleErrorMock.reset();
+    });
+
+    it('should raise a warning when we can listen to events', () => {
+      mount(
+        <Tooltip title="Hello World">
+          <button disabled>Hello World</button>
+        </Tooltip>,
+      );
+      assert.strictEqual(consoleErrorMock.callCount(), 1, 'should call console.error');
+      assert.match(
+        consoleErrorMock.args()[0][0],
+        /Material-UI: you are providing a disabled button children to the Tooltip component/,
+      );
     });
   });
 });

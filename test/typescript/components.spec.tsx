@@ -14,6 +14,7 @@ import {
   Checkbox,
   Chip,
   CircularProgress,
+  ClickAwayListener,
   Dialog,
   DialogTitle,
   Divider,
@@ -53,7 +54,7 @@ import Table, {
   TableRow,
 } from '../../src/Table';
 import { withStyles, StyleRulesCallback } from '../../src/styles';
-import { withResponsiveFullScreen, DialogProps } from '../../src/Dialog';
+import { withMobileDialog, DialogProps } from '../../src/Dialog';
 import { WithStyles } from '../../src/styles/withStyles';
 import GridListTile from '../../src/GridList/GridListTile';
 
@@ -221,12 +222,12 @@ const ChipsTest = () =>
     <Chip
       avatar={<Avatar>MB</Avatar>}
       label="Clickable Chip"
-      onClick={(e: React.SyntheticEvent<any>) => log(e)}
+      onClick={e => log(e)}
     />
     <Chip
       avatar={<Avatar src={'image.bmp'} />}
       label="Deletable Chip"
-      onRequestDelete={(e: React.SyntheticEvent<any>) => log(e)}
+      onRequestDelete={e => log(e)}
     />
     <Chip
       avatar={
@@ -235,8 +236,8 @@ const ChipsTest = () =>
         </Avatar>
       }
       label="Clickable Deletable Chip"
-      onClick={(e: React.SyntheticEvent<any>) => log(e)}
-      onRequestDelete={(e: React.SyntheticEvent<any>) => log(e)}
+      onClick={e => log(e)}
+      onRequestDelete={e => log(e)}
     />
   </div>;
 
@@ -250,7 +251,7 @@ const DialogTest = () => {
           {emails.map(email =>
             <ListItem
               button
-              onClick={(e: React.SyntheticEvent<any>) => log(e)}
+              onClick={e => log(e)}
               key={email}
             >
               <ListItemAvatar>
@@ -261,7 +262,7 @@ const DialogTest = () => {
               <ListItemText primary={email} />
             </ListItem>
           )}
-          <ListItem button onClick={(e: React.SyntheticEvent<any>) => log(e)}>
+          <ListItem button onClick={e => log(e)}>
             <ListItemAvatar>
               <Avatar>
                 <FakeIcon />
@@ -293,8 +294,8 @@ const DrawerTest = () => {
       <Drawer
         type="persistent"
         open={open.left}
-        onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
-        onClick={(e: React.SyntheticEvent<any>) => log(e)}
+        onRequestClose={e => log(e)}
+        onClick={e => log(e)}
       >
         List
       </Drawer>
@@ -302,8 +303,8 @@ const DrawerTest = () => {
         type="temporary"
         anchor="top"
         open={open.top}
-        onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
-        onClick={(e: React.SyntheticEvent<any>) => log(e)}
+        onRequestClose={e => log(e)}
+        onClick={e => log(e)}
       >
         List
       </Drawer>
@@ -311,8 +312,8 @@ const DrawerTest = () => {
         anchor="bottom"
         type="temporary"
         open={open.bottom}
-        onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
-        onClick={(e: React.SyntheticEvent<any>) => log(e)}
+        onRequestClose={e => log(e)}
+        onClick={e => log(e)}
       >
         List
       </Drawer>
@@ -320,8 +321,8 @@ const DrawerTest = () => {
         type="persistent"
         anchor="right"
         open={open.right}
-        onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
-        onClick={(e: React.SyntheticEvent<any>) => log(e)}
+        onRequestClose={e => log(e)}
+        onClick={e => log(e)}
       >
         List
       </Drawer>
@@ -330,7 +331,7 @@ const DrawerTest = () => {
 };
 
 const GridTest = () =>
-  <Grid container>
+  <Grid component={Paper} container>
     <Grid item xs={12}>
       ...
     </Grid>
@@ -346,8 +347,8 @@ const GridTest = () =>
   </Grid>;
 
 const GridListTest = () =>
-  <GridList cellHeight={160} cols={3}>
-    <GridListTile cols={1} rows={4}>
+  <GridList cellHeight={160} cols={3} onClick={e => log(e)}>
+    <GridListTile cols={1} rows={4} onClick={e => log(e)}>
       <img src="img.png" alt="alt text" />
     </GridListTile>,
   </GridList>;
@@ -359,7 +360,7 @@ const ListTest = () =>
         dense
         button
         key={value}
-        onClick={(e: React.SyntheticEvent<any>) => log(e)}
+        onClick={e => log(e)}
       >
         <Checkbox checked={true} tabIndex={-1} disableRipple />
         <ListItemText primary={`Line item ${value + 1}`} />
@@ -385,13 +386,13 @@ const MenuTest = () => {
       id="lock-menu"
       anchorEl={anchorEl}
       open={true}
-      onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
+      onRequestClose={e => log(e)}
     >
       {options.map((option, index) =>
         <MenuItem
           key={option}
           selected={false}
-          onClick={(e: React.SyntheticEvent<any>) => log(e)}
+          onClick={e => log(e)}
         >
           {option}
         </MenuItem>
@@ -527,7 +528,7 @@ const SwitchTest = () => {
 
 const SnackbarTest = () =>
   <div>
-    <Button onClick={(e: React.SyntheticEvent<any>) => log(e)}>
+    <Button onClick={e => log(e)}>
       Open simple snackbar
     </Button>
     <Snackbar
@@ -537,7 +538,7 @@ const SnackbarTest = () =>
       }}
       open={true}
       autoHideDuration={6e3}
-      onRequestClose={(e: React.SyntheticEvent<any>) => log(e)}
+      onRequestClose={e => log(e)}
       SnackbarContentProps={{
         'aria-describedby': 'message-id',
       }}
@@ -547,7 +548,7 @@ const SnackbarTest = () =>
           key="undo"
           color="accent"
           dense
-          onClick={(e: React.SyntheticEvent<any>) => log(e)}
+          onClick={e => log(e)}
         >
           UNDO
         </Button>,
@@ -555,7 +556,7 @@ const SnackbarTest = () =>
           key="close"
           aria-label="Close"
           color="inherit"
-          onClick={(e: React.SyntheticEvent<any>) => log(e)}
+          onClick={e => log(e)}
         >
           <FakeIcon />
         </IconButton>,
@@ -782,11 +783,7 @@ const TextFieldTest = () =>
   </div>;
 
 const SelectTest = () => {
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log(e.currentTarget.value);
-  };
-
-  <Select input={<Input />} value={10} onChange={handleChange}>
+  <Select input={<Input />} value={10} onChange={e => log(e.currentTarget.value)}>
     <MenuItem value="">
       <em>None</em>
     </MenuItem>
@@ -797,7 +794,7 @@ const SelectTest = () => {
 };
 
 const ResponsiveComponentTest = () => {
-  const ResponsiveComponent = withResponsiveFullScreen({
+  const ResponsiveComponent = withMobileDialog({
     breakpoint: 'sm',
   })(({ children, width }) =>
     <div style={{ width }}>
@@ -806,7 +803,7 @@ const ResponsiveComponentTest = () => {
   );
   <ResponsiveComponent />;
 
-  const ResponsiveDialogComponent = withResponsiveFullScreen<DialogProps>({
+  const ResponsiveDialogComponent = withMobileDialog<DialogProps>({
     breakpoint: 'sm',
   })(Dialog);
 };
@@ -820,3 +817,9 @@ const TooltipComponentTest = () =>
       <Button>top-start</Button>
     </Tooltip>
   </div>
+
+const ClickAwayListenerComponentTest = () =>
+  <ClickAwayListener onClickAway={() => {}}>
+    <div />
+  </ClickAwayListener>
+

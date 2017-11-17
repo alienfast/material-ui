@@ -32,6 +32,9 @@ export const styles = (theme: Object) => ({
   caption: {
     flexShrink: 0,
   },
+  input: {
+    fontSize: 'inherit',
+  },
   selectRoot: {
     marginRight: theme.spacing.unit * 4,
   },
@@ -60,14 +63,21 @@ export type LabelDisplayedRowsArgs = {
 
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
   component: ElementType,
-  labelRowsPerPage: string,
-  labelDisplayedRows: (paginationInfo: LabelDisplayedRowsArgs) => string,
+  labelRowsPerPage: Node,
+  labelDisplayedRows: (paginationInfo: LabelDisplayedRowsArgs) => Node,
   rowsPerPageOptions: number[],
-  theme: Object,
 };
 
 export type Props = {
+  /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
   /**
    * Useful to extend the style applied to components.
    */
@@ -76,7 +86,7 @@ export type Props = {
    * The component used for the root node.
    * Either a string to use a DOM element or a component.
    */
-  component?: ElementType,
+  component: ElementType,
   /**
    * @ignore
    */
@@ -88,20 +98,23 @@ export type Props = {
   /**
    * Useful to customize the displayed rows label.
    */
-  labelDisplayedRows?: (paginationInfo: LabelDisplayedRowsArgs) => Node,
+  labelDisplayedRows: (paginationInfo: LabelDisplayedRowsArgs) => Node,
   /**
    * Useful to customize the rows per page label. Invoked with a `{ from, to, count, page }`
    * object.
    */
   labelRowsPerPage?: Node,
   /**
-   * Callback fired when the page is changed. Invoked with two arguments: the event and the
-   * page to show.
+   * Callback fired when the page is changed.
+   *
+   * @param {object} event The event source of the callback
+   * @param {number} page The page selected
    */
   onChangePage: (event: SyntheticInputEvent<> | null, page: number) => void,
   /**
-   * Callback fired when the number of rows per page is changed. Invoked with two arguments: the
-   * event.
+   * Callback fired when the number of rows per page is changed.
+   *
+   * @param {object} event The event source of the callback
    */
   onChangeRowsPerPage: (event: SyntheticInputEvent<>) => void,
   /**
@@ -115,7 +128,7 @@ export type Props = {
   /**
    * Customizes the options of the rows per page select field.
    */
-  rowsPerPageOptions?: number[],
+  rowsPerPageOptions: number[],
   /**
    * @ignore
    */
@@ -123,17 +136,18 @@ export type Props = {
 };
 
 /**
- * A `TableRow` based component for placing inside `TableFooter` for pagination.
+ * A `TableCell` based component for placing inside `TableFooter` for pagination.
  */
 class TablePagination extends React.Component<ProvidedProps & Props> {
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     component: TableCell,
     labelRowsPerPage: 'Rows per page:',
     labelDisplayedRows: ({ from, to, count }) => `${from}-${to} of ${count}`,
     rowsPerPageOptions: [5, 10, 25],
   };
 
-  componentWillReceiveProps({ count, onChangePage, rowsPerPage }) {
+  componentWillReceiveProps(nextProps) {
+    const { count, onChangePage, rowsPerPage } = nextProps;
     const newLastPage = Math.max(0, Math.ceil(count / rowsPerPage) - 1);
     if (this.props.page > newLastPage) {
       onChangePage(null, newLastPage);
@@ -168,8 +182,10 @@ class TablePagination extends React.Component<ProvidedProps & Props> {
     let colSpan;
 
     if (Component === TableCell || Component === 'td') {
-      colSpan = colSpanProp || 9001; // col-span over everything
+      colSpan = colSpanProp || 1000; // col-span over everything
     }
+
+    const themeDirection = theme && theme.direction;
 
     return (
       <Component className={classes.root} colSpan={colSpan} {...other}>
@@ -180,7 +196,14 @@ class TablePagination extends React.Component<ProvidedProps & Props> {
           </Typography>
           <Select
             classes={{ root: classes.selectRoot, select: classes.select }}
-            input={<Input disableUnderline />}
+            input={
+              <Input
+                classes={{
+                  root: classes.input,
+                }}
+                disableUnderline
+              />
+            }
             value={rowsPerPage}
             onChange={onChangeRowsPerPage}
           >
@@ -200,13 +223,13 @@ class TablePagination extends React.Component<ProvidedProps & Props> {
           </Typography>
           <div className={classes.actions}>
             <IconButton onClick={this.handleBackButtonClick} disabled={page === 0}>
-              {theme.direction === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
+              {themeDirection === 'rtl' ? <KeyboardArrowRight /> : <KeyboardArrowLeft />}
             </IconButton>
             <IconButton
               onClick={this.handleNextButtonClick}
               disabled={page >= Math.ceil(count / rowsPerPage) - 1}
             >
-              {theme.direction === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
+              {themeDirection === 'rtl' ? <KeyboardArrowLeft /> : <KeyboardArrowRight />}
             </IconButton>
           </div>
         </Toolbar>

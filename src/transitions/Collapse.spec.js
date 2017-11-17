@@ -41,6 +41,7 @@ describe('<Collapse />', () => {
     assert.strictEqual(
       child
         .childAt(0)
+        .childAt(0)
         .children()
         .type(),
       'h1',
@@ -339,6 +340,7 @@ describe('<Collapse />', () => {
 
     it('should return autoTransitionDuration when timeout is auto', () => {
       const wrapper = shallow(<Collapse {...props} timeout="auto" />);
+      assert.strictEqual(wrapper.props().timeout, null);
       instance = wrapper.instance();
       const next = spy();
 
@@ -359,13 +361,14 @@ describe('<Collapse />', () => {
     it('should return props.timeout when timeout is number', () => {
       const timeout = 10;
       const wrapper = shallow(<Collapse {...props} timeout={timeout} />);
+      assert.strictEqual(wrapper.props().timeout, timeout);
       instance = wrapper.instance();
 
       const next = spy();
       instance.addEndListener(null, next);
       assert.strictEqual(next.callCount, 0);
       clock.tick(timeout);
-      assert.strictEqual(next.callCount, 1);
+      assert.strictEqual(next.callCount, 0);
     });
   });
 

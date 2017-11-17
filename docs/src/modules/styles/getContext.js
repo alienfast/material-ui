@@ -2,8 +2,8 @@
 /* eslint-disable no-underscore-dangle */
 
 import { create, SheetsRegistry } from 'jss';
-import preset from 'jss-preset-default';
 import rtl from 'jss-rtl';
+import { preset } from 'material-ui/styles/withStyles';
 import { createMuiTheme } from 'material-ui/styles';
 import blue from 'material-ui/colors/blue';
 import pink from 'material-ui/colors/pink';
@@ -38,6 +38,7 @@ function createContext() {
     sheetsManager: new Map(),
     // This is needed in order to inject the critical CSS.
     sheetsRegistry: new SheetsRegistry(),
+    generateClassName: jss.options.createGenerateClassName(),
   };
 }
 

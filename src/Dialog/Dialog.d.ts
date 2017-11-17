@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { StandardProps } from '..';
-import { ModalProps, ModalClassKey } from '../internal/Modal';
+import { ModalProps, ModalClassKey } from '../Modal';
 import { TransitionDuration } from '../internal/transition';
 
 export interface DialogProps extends StandardProps<
@@ -14,11 +14,11 @@ export interface DialogProps extends StandardProps<
   transitionDuration?: TransitionDuration;
   maxWidth?: 'xs' | 'sm' | 'md';
   fullWidth?: boolean;
-  onBackdropClick?: Function;		
+  onBackdropClick?: Function;
   onEscapeKeyUp?: Function;
   onRequestClose?: React.EventHandler<any>;
   open?: boolean;
-  transition?: Function | React.ReactElement<any>;
+  transition?: React.ReactType;
 }
 
 export type DialogClassKey =

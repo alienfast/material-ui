@@ -34,15 +34,14 @@ export function isDirty(obj, SSR = false) {
   );
 }
 
-// Determine if an Input is adorned
-//
-// Response determines if label is presented above field or as placeholder.
+// Determine if an Input is adorned on start.
+// It's corresponding to the left with LTR.
 //
 // @param obj
 // @returns {boolean} False when no adornments.
-//                    True when adorned.
-export function isAdorned(obj) {
-  return obj.startAdornment || obj.endAdornment;
+//                    True when adorned at the start.
+export function isAdornedStart(obj) {
+  return obj.startAdornment;
 }
 
 export const styles = (theme: Object) => {
@@ -64,10 +63,12 @@ export const styles = (theme: Object) => {
   return {
     root: {
       // Mimics the default input display property used by browsers for an input.
-      display: 'inline-block',
+      display: 'inline-flex',
+      alignItems: 'baseline',
       position: 'relative',
       fontFamily: theme.typography.fontFamily,
       color: theme.palette.input.inputText,
+      fontSize: theme.typography.pxToRem(16),
     },
     formControl: {
       'label + &': {
@@ -89,7 +90,7 @@ export const styles = (theme: Object) => {
           duration: theme.transitions.duration.shorter,
           easing: theme.transitions.easing.easeOut,
         }),
-        pointerEvent: 'none', // Transparent to the hover style.
+        pointerEvents: 'none', // Transparent to the hover style.
       },
       '&$focused:after': {
         transform: 'scaleX(1)',
@@ -101,16 +102,57 @@ export const styles = (theme: Object) => {
         transform: 'scaleX(1)', // error is always underlined in red
       },
     },
+    disabled: {
+      color: theme.palette.text.disabled,
+    },
+    focused: {},
+    underline: {
+      '&:before': {
+        backgroundColor: theme.palette.input.bottomLine,
+        left: 0,
+        bottom: 0,
+        // Doing the other way around crash on IE11 "''" https://github.com/cssinjs/jss/issues/242
+        content: '""',
+        height: 1,
+        position: 'absolute',
+        right: 0,
+        transition: theme.transitions.create('background-color', {
+          duration: theme.transitions.duration.shorter,
+          easing: theme.transitions.easing.ease,
+        }),
+        pointerEvents: 'none', // Transparent to the hover style.
+      },
+      '&:hover:not($disabled):before': {
+        backgroundColor: theme.palette.text.primary,
+        height: 2,
+      },
+      '&$disabled:before': {
+        background: 'transparent',
+        backgroundImage: `linear-gradient(to right, ${
+          theme.palette.input.bottomLine
+        } 33%, transparent 0%)`,
+        backgroundPosition: 'left top',
+        backgroundRepeat: 'repeat-x',
+        backgroundSize: '5px 1px',
+      },
+    },
+    multiline: {
+      padding: `${theme.spacing.unit - 2}px 0 ${theme.spacing.unit - 1}px`,
+    },
+    fullWidth: {
+      width: '100%',
+    },
     input: {
       font: 'inherit',
       color: 'currentColor',
-      // slight alteration to spec spacing to match visual spec result
-      padding: `${theme.spacing.unit - 1}px 0 ${theme.spacing.unit + 1}px`,
+      padding: `${theme.spacing.unit - 2}px 0 ${theme.spacing.unit - 1}px`,
       border: 0,
       boxSizing: 'content-box',
       verticalAlign: 'middle',
       background: 'none',
       margin: 0, // Reset for Safari
+      // Remove grey highlight
+      WebkitTapHighlightColor: theme.palette.common.transparent,
       display: 'block',
       width: '100%',
       '&::-webkit-input-placeholder': placeholder,
@@ -140,74 +182,35 @@ export const styles = (theme: Object) => {
         '&:focus::-ms-input-placeholder': placeholderVisible, // Edge
       },
     },
-    inputAdorned: {
-      display: 'inline-block',
-      width: 'auto',
-    },
     inputDense: {
-      paddingTop: theme.spacing.unit / 2,
-    },
-    disabled: {
-      color: theme.palette.text.disabled,
-    },
-    focused: {},
-    underline: {
-      '&:before': {
-        backgroundColor: theme.palette.input.bottomLine,
-        left: 0,
-        bottom: 0,
-        // Doing the other way around crash on IE11 "''" https://github.com/cssinjs/jss/issues/242
-        content: '""',
-        height: 1,
-        position: 'absolute',
-        right: 0,
-        transition: theme.transitions.create('background-color', {
-          duration: theme.transitions.duration.shorter,
-          easing: theme.transitions.easing.ease,
-        }),
-        pointerEvent: 'none', // Transparent to the hover style.
-      },
-      '&:hover:not($disabled):before': {
-        backgroundColor: theme.palette.text.primary,
-        height: 2,
-      },
-      '&$disabled:before': {
-        background: 'transparent',
-        backgroundImage: `linear-gradient(to right, ${theme.palette.input
-          .bottomLine} 33%, transparent 0%)`,
-        backgroundPosition: 'left top',
-        backgroundRepeat: 'repeat-x',
-        backgroundSize: '5px 1px',
-      },
-    },
-    multiline: {
-      padding: `${theme.spacing.unit - 2}px 0 ${theme.spacing.unit - 1}px`,
+      paddingTop: theme.spacing.unit / 2 - 1,
     },
     inputDisabled: {
       opacity: 1, // Reset iOS opacity
     },
     inputSingleline: {
-      height: '1em',
-    },
-    inputSearch: {
-      appearance: 'textfield', // Improve type search style.
+      height: '1.1875em', // Reset (19px)
     },
     inputMultiline: {
       resize: 'none',
       padding: 0,
     },
-    fullWidth: {
-      width: '100%',
+    inputSearch: {
+      appearance: 'textfield', // Improve type search style.
     },
   };
 };
 
 type ProvidedProps = {
   classes: Object,
-  disableUnderline: boolean,
-  fullWidth: boolean,
-  multiline: boolean,
-  type: string,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  disableUnderline?: boolean,
+  fullWidth?: boolean,
+  multiline?: boolean,
+  type?: string,
 };
 
 export type Props = {
@@ -353,7 +356,7 @@ type State = {
 class Input extends React.Component<ProvidedProps & Props, State> {
   static muiName = 'Input';
 
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     disableUnderline: false,
     fullWidth: false,
     multiline: false,
@@ -376,10 +379,28 @@ class Input extends React.Component<ProvidedProps & Props, State> {
     }
   }
 
+  componentWillReceiveProps(nextProps) {
+    // The blur won't fire when the disabled state is set on a focused input.
+    // We need to book keep the focused state manually.
+    if (!this.props.disabled && nextProps.disabled) {
+      this.setState({
+        focused: false,
+      });
+    }
+  }
+
   componentWillUpdate(nextProps) {
-    if (this.isControlled()) {
+    if (this.isControlled(nextProps)) {
       this.checkDirty(nextProps);
     } // else performed in the onChange
+
+    // Book keep the focused state.
+    if (!this.props.disabled && nextProps.disabled) {
+      const { muiFormControl } = this.context;
+      if (muiFormControl && muiFormControl.onBlur) {
+        muiFormControl.onBlur();
+      }
+    }
   }
 
   // Holds the input reference
@@ -414,6 +435,8 @@ class Input extends React.Component<ProvidedProps & Props, State> {
     this.input = node;
     if (this.props.inputRef) {
       this.props.inputRef(node);
+    } else if (this.props.inputProps && this.props.inputProps.ref) {
+      this.props.inputProps.ref(node);
     }
   };
 
@@ -421,8 +444,8 @@ class Input extends React.Component<ProvidedProps & Props, State> {
   //
   // @see https://facebook.github.io/react/docs/forms.html#controlled-components
   // @returns {boolean} true if string (including '') or number (including zero)
-  isControlled() {
-    return hasValue(this.props.value);
+  isControlled(props = this.props) {
+    return hasValue(props.value);
   }
 
   checkDirty(obj) {
@@ -460,7 +483,7 @@ class Input extends React.Component<ProvidedProps & Props, State> {
       fullWidth,
       id,
       inputComponent,
-      inputProps: { inputPropsClassName, ...inputPropsProp } = {},
+      inputProps: { className: inputPropsClassName, ...inputPropsProp } = {},
       inputRef,
       margin: marginProp,
       multiline,
@@ -484,7 +507,6 @@ class Input extends React.Component<ProvidedProps & Props, State> {
     } = this.props;
 
     const { muiFormControl } = this.context;
-
     let disabled = disabledProp;
     let error = errorProp;
     let margin = marginProp;
@@ -523,10 +545,9 @@ class Input extends React.Component<ProvidedProps & Props, State> {
       {
         [classes.inputDisabled]: disabled,
         [classes.inputSingleline]: !multiline,
-        [classes.inputSearch]: type === 'search',
         [classes.inputMultiline]: multiline,
+        [classes.inputSearch]: type === 'search',
         [classes.inputDense]: margin === 'dense',
-        [classes.inputAdorned]: startAdornment || endAdornment,
       },
       inputPropsClassName,
     );
@@ -535,8 +556,8 @@ class Input extends React.Component<ProvidedProps & Props, State> {
 
     let InputComponent = 'input';
     let inputProps = {
-      ref: this.handleRefInput,
       ...inputPropsProp,
+      ref: this.handleRefInput,
     };
 
     if (inputComponent) {

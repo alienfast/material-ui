@@ -128,7 +128,7 @@ describe('<Snackbar />', () => {
       assert.deepEqual(handleRequestClose.args[0], [null, 'timeout']);
     });
 
-    it('should not call onRequestClose with not timeout', () => {
+    it('should not call onRequestClose if autoHideDuration is undefined', () => {
       const handleRequestClose = spy();
       const autoHideDuration = 2e3;
       mount(
@@ -137,6 +137,23 @@ describe('<Snackbar />', () => {
           onRequestClose={handleRequestClose}
           message="message"
           autoHideDuration={undefined}
+        />,
+      );
+
+      assert.strictEqual(handleRequestClose.callCount, 0);
+      clock.tick(autoHideDuration);
+      assert.strictEqual(handleRequestClose.callCount, 0);
+    });
+
+    it('should not call onRequestClose if autoHideDuration is null', () => {
+      const handleRequestClose = spy();
+      const autoHideDuration = 2e3;
+      mount(
+        <Snackbar
+          open
+          onRequestClose={handleRequestClose}
+          message="message"
+          autoHideDuration={null}
         />,
       );
 
@@ -243,6 +260,18 @@ describe('<Snackbar />', () => {
       const children = <div />;
       const wrapper = shallow(<Snackbar open>{children}</Snackbar>);
       assert.strictEqual(wrapper.contains(children), true);
+    });
+  });
+
+  describe('prop: transition', () => {
+    it('should render a Snackbar with transition', () => {
+      const Transition = props => <div className="cloned-element-class" {...props} />;
+      const wrapper = shallow(<Snackbar open transition={Transition} />);
+      assert.strictEqual(
+        wrapper.find(Transition).length,
+        1,
+        'should include element given in transition',
+      );
     });
   });
 });

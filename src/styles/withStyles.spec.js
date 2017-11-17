@@ -5,8 +5,7 @@ import { spy } from 'sinon';
 import { assert } from 'chai';
 import JssProvider from 'react-jss/lib/JssProvider';
 import { create, SheetsRegistry } from 'jss';
-import preset from 'jss-preset-default';
-import withStyles from './withStyles';
+import withStyles, { preset } from './withStyles';
 import MuiThemeProvider from './MuiThemeProvider';
 import createMuiTheme from './createMuiTheme';
 import createGenerateClassName from './createGenerateClassName';
@@ -14,7 +13,7 @@ import { createShallow, createMount, getClasses } from '../test-utils';
 import consoleErrorMock from '../../test/utils/consoleErrorMock';
 
 // eslint-disable-next-line react/prefer-stateless-function
-class Empty extends React.Component<{}> {
+class Empty extends React.Component<{ classes: Object, theme: Object }> {
   render() {
     return <div />;
   }
@@ -204,6 +203,27 @@ describe('withStyles', () => {
         wrapper.unmount();
         assert.strictEqual(sheetsRegistry.registry.length, 0);
       });
+    });
+  });
+
+  describe('HMR with same state', () => {
+    it('should take the new stylesCreator into account', () => {
+      const styles1 = { root: { padding: 1 } };
+      const StyledComponent1 = withStyles(styles1, { name: 'MuiTextField' })(Empty);
+      const wrapper = shallow(<StyledComponent1 />);
+
+      const styles2 = { root: { padding: 2 } };
+      const StyledComponent2 = withStyles(styles2, { name: 'MuiTextField' })(Empty);
+
+      // Simulate react-hot-loader behavior
+      wrapper.instance().componentWillReceiveProps = // $FlowExpectedError
+        StyledComponent2.prototype.componentWillReceiveProps;
+
+      const classes1 = wrapper.props().classes.root;
+      wrapper.setProps({});
+      const classes2 = wrapper.props().classes.root;
+
+      assert.notStrictEqual(classes1, classes2, 'should generate new classes');
     });
   });
 });

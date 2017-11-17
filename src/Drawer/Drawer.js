@@ -1,9 +1,10 @@
 // @flow
+// @inheritedComponent Modal
 
 import React from 'react';
 import type { Node } from 'react';
 import classNames from 'classnames';
-import Modal from '../internal/Modal';
+import Modal from '../Modal';
 import withStyles from '../styles/withStyles';
 import Slide from '../transitions/Slide';
 import Paper from '../Paper';
@@ -34,14 +35,17 @@ export const styles = (theme: Object) => ({
     flexDirection: 'column',
     height: '100vh',
     flex: '1 0 auto',
+    zIndex: theme.zIndex.navDrawer,
+    WebkitOverflowScrolling: 'touch', // Add iOS momentum scrolling.
+    // temporary style
     position: 'fixed',
     top: 0,
-    zIndex: theme.zIndex.navDrawer,
-    willChange: 'transform',
+    // We disable the focus ring for mouse, touch and keyboard users.
+    // At some point, it would be better to keep it for keyboard users.
+    // :focus-ring CSS pseudo-class will help.
     '&:focus': {
       outline: 'none',
     },
-    WebkitOverflowScrolling: 'touch', // Add iOS momentum scrolling.
   },
   paperAnchorLeft: {
     left: 0,
@@ -70,8 +74,14 @@ export const styles = (theme: Object) => ({
   paperAnchorDockedLeft: {
     borderRight: `1px solid ${theme.palette.text.divider}`,
   },
+  paperAnchorDockedTop: {
+    borderBottom: `1px solid ${theme.palette.text.divider}`,
+  },
   paperAnchorDockedRight: {
     borderLeft: `1px solid ${theme.palette.text.divider}`,
+  },
+  paperAnchorDockedBottom: {
+    borderTop: `1px solid ${theme.palette.text.divider}`,
   },
   modal: {}, // Just here so people can override the style.
 });
@@ -80,8 +90,12 @@ export type Anchor = 'left' | 'top' | 'right' | 'bottom';
 export type Type = 'permanent' | 'persistent' | 'temporary';
 
 type ProvidedProps = {
-  anchor: Anchor,
   classes: Object,
+  theme?: Object,
+};
+
+type DefaultProps = {
+  anchor: Anchor,
   elevation: number,
   transitionDuration: TransitionDuration,
   open: boolean,
@@ -90,9 +104,13 @@ type ProvidedProps = {
 
 export type Props = {
   /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
+  /**
    * Side from which the drawer will appear.
    */
-  anchor?: Anchor,
+  anchor: Anchor,
   /**
    * The contents of the drawer.
    */
@@ -108,12 +126,12 @@ export type Props = {
   /**
    * The elevation of the drawer.
    */
-  elevation?: number,
+  elevation: number,
   /**
    * The duration for the transition, in milliseconds.
    * You may specify a single timeout for all transitions, or individually with an object.
    */
-  transitionDuration?: TransitionDuration,
+  transitionDuration: TransitionDuration,
   /**
    * Properties applied to the `Modal` element.
    */
@@ -127,11 +145,11 @@ export type Props = {
   /**
    * If `true`, the drawer is open.
    */
-  open?: boolean,
+  open: boolean,
   /**
-   * @igonre
+   * @ignore
    */
-  theme: Object,
+  theme?: Object,
   /**
    * Properties applied to the `Slide` element.
    */
@@ -139,7 +157,7 @@ export type Props = {
   /**
    * The type of drawer.
    */
-  type?: Type,
+  type: Type,
 };
 
 type State = {
@@ -147,7 +165,7 @@ type State = {
 };
 
 class Drawer extends React.Component<ProvidedProps & Props, State> {
-  static defaultProps = {
+  static defaultProps: DefaultProps = {
     anchor: 'left',
     elevation: 16,
     transitionDuration: {
@@ -188,7 +206,7 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
       ...other
     } = this.props;
 
-    const rtl = theme.direction === 'rtl';
+    const rtl = theme && theme.direction === 'rtl';
     let anchor = anchorProp;
     if (rtl && ['left', 'right'].includes(anchor)) {
       anchor = anchor === 'left' ? 'right' : 'left';
@@ -198,10 +216,13 @@ class Drawer extends React.Component<ProvidedProps & Props, State> {
       <Paper
         elevation={type === 'temporary' ? elevation : 0}
         square
-        className={classNames(classes.paper, {
-          [classes[`paperAnchor${capitalizeFirstLetter(anchor)}`]]: type !== 'permanent',
-          [classes[`paperAnchorDocked${capitalizeFirstLetter(anchor)}`]]: type !== 'temporary',
-        })}
+        className={classNames(
+          classes.paper,
+          classes[`paperAnchor${capitalizeFirstLetter(anchor)}`],
+          {
+            [classes[`paperAnchorDocked${capitalizeFirstLetter(anchor)}`]]: type !== 'temporary',
+          },
+        )}
       >
         {children}
       </Paper>

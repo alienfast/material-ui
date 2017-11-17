@@ -38,13 +38,13 @@ export const styles = (theme: Object) => ({
   },
   label: {
     fontFamily: theme.typography.fontFamily,
-    fontSize: theme.typography.fontSize - 2,
+    fontSize: theme.typography.pxToRem(theme.typography.fontSize - 2),
     opacity: 1,
     transition: 'font-size 0.2s, opacity 0.2s',
     transitionDelay: '0.1s',
   },
   selectedLabel: {
-    fontSize: theme.typography.fontSize,
+    fontSize: theme.typography.pxToRem(theme.typography.fontSize),
   },
   hiddenLabel: {
     opacity: 0,
@@ -58,9 +58,14 @@ export const styles = (theme: Object) => ({
 
 type ProvidedProps = {
   classes: Object,
+  theme?: Object,
 };
 
 export type Props = {
+  /**
+   * Other base element props.
+   */
+  [otherProp: string]: any,
   /**
    * Useful to extend the style applied to components.
    */
@@ -100,6 +105,8 @@ export type Props = {
 };
 
 class BottomNavigationButton extends React.Component<ProvidedProps & Props> {
+  static defaultProps = {};
+
   handleChange = event => {
     const { onChange, value, onClick } = this.props;
 

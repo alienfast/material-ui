@@ -17,6 +17,7 @@ describe('<Slide />', () => {
   const props = {
     in: true,
     children: <div />,
+    direction: 'down',
   };
 
   before(() => {
@@ -94,6 +95,21 @@ describe('<Slide />', () => {
         easing: easing.sharp,
       });
       assert.strictEqual(element.style.transition, animation);
+    });
+  });
+
+  describe('prop: direction', () => {
+    it('should update the position', () => {
+      const wrapper = mount(<SlideNaked {...props} in={false} direction="left" />);
+      const transition = findDOMNode(wrapper.instance().transition);
+      // $FlowExpectedError
+      const transition1 = transition.style.transform;
+      wrapper.setProps({
+        direction: 'right',
+      });
+      // $FlowExpectedError
+      const transition2 = transition.style.transform;
+      assert.notStrictEqual(transition1, transition2);
     });
   });
 
@@ -203,7 +219,9 @@ describe('<Slide />', () => {
         </SlideNaked>,
       );
       const transition = findDOMNode(wrapper.instance().transition);
-      // $FlowFixMe
+      // $FlowExpectedError
+      assert.strictEqual(transition.style.visibility, 'inherit');
+      // $FlowExpectedError
       assert.notStrictEqual(transition.style.transform, undefined);
     });
   });
@@ -229,7 +247,7 @@ describe('<Slide />', () => {
       instance.handleResize();
       clock.tick(166);
       const transition = findDOMNode(instance.transition);
-      // $FlowFixMe
+      // $FlowExpectedError
       assert.notStrictEqual(transition.style.transform, undefined);
     });
 
