@@ -21,6 +21,9 @@ export const styles = (theme: Object) => ({
 
 type ProvidedProps = {
   classes: Object,
+  /**
+   * @ignore
+   */
   theme?: Object,
 };
 
@@ -35,11 +38,11 @@ export type Props = {
    */
   checkedIcon?: Node,
   /**
-   * Useful to extend the style applied to components.
+   * @ignore
    */
   children?: Node,
   /**
-   * @ignore
+   * Useful to extend the style applied to components.
    */
   classes?: Object,
   /**

@@ -16,7 +16,7 @@ filename: /src/Card/CardActions.js
 | classes | Object |  | Useful to extend the style applied to components. |
 | disableActionSpacing | boolean | false | If `true`, the card actions do not have additional margin. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

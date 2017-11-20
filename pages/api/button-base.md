@@ -23,7 +23,7 @@ filename: /src/ButtonBase/ButtonBase.js
 | onKeyboardFocus | signature |  | Callback fired when the component is focused with a keyboard. We trigger a `onFocus` callback too. |
 | rootRef | Function |  | Use that property to pass a ref callback to the root component. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

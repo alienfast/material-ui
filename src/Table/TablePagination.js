@@ -63,6 +63,9 @@ export type LabelDisplayedRowsArgs = {
 
 type ProvidedProps = {
   classes: Object,
+  /**
+   * @ignore
+   */
   theme?: Object,
 };
 
@@ -121,13 +124,10 @@ export type Props = {
    */
   rowsPerPage: number,
   /**
-   * Customizes the options of the rows per page select field.
+   * Customizes the options of the rows per page select field. If less than two options are
+   * available, no select field will be displayed.
    */
-  rowsPerPageOptions: number[],
-  /**
-   * @ignore
-   */
-  theme?: Object,
+  rowsPerPageOptions: Array<number>,
 };
 
 /**
@@ -186,28 +186,32 @@ class TablePagination extends React.Component<ProvidedProps & Props> {
       <Component className={classes.root} colSpan={colSpan} {...other}>
         <Toolbar className={classes.toolbar}>
           <div className={classes.spacer} />
-          <Typography type="caption" className={classes.caption}>
-            {labelRowsPerPage}
-          </Typography>
-          <Select
-            classes={{ root: classes.selectRoot, select: classes.select }}
-            input={
-              <Input
-                classes={{
-                  root: classes.input,
-                }}
-                disableUnderline
-              />
-            }
-            value={rowsPerPage}
-            onChange={onChangeRowsPerPage}
-          >
-            {rowsPerPageOptions.map(rowsPerPageOption => (
-              <MenuItem key={rowsPerPageOption} value={rowsPerPageOption}>
-                {rowsPerPageOption}
-              </MenuItem>
-            ))}
-          </Select>
+          {rowsPerPageOptions.length > 1 && (
+            <Typography type="caption" className={classes.caption}>
+              {labelRowsPerPage}
+            </Typography>
+          )}
+          {rowsPerPageOptions.length > 1 && (
+            <Select
+              classes={{ root: classes.selectRoot, select: classes.select }}
+              input={
+                <Input
+                  classes={{
+                    root: classes.input,
+                  }}
+                  disableUnderline
+                />
+              }
+              value={rowsPerPage}
+              onChange={onChangeRowsPerPage}
+            >
+              {rowsPerPageOptions.map(rowsPerPageOption => (
+                <MenuItem key={rowsPerPageOption} value={rowsPerPageOption}>
+                  {rowsPerPageOption}
+                </MenuItem>
+              ))}
+            </Select>
+          )}
           <Typography type="caption" className={classes.caption}>
             {labelDisplayedRows({
               from: count === 0 ? 0 : page * rowsPerPage + 1,

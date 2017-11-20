@@ -18,7 +18,7 @@ filename: /src/List/ListItemText.js
 | primary | Node | false |  |
 | secondary | Node | false |  |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

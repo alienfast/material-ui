@@ -20,7 +20,7 @@ filename: /src/MobileStepper/MobileStepper.js
 | <span style="color: #31a148">steps *</span> | number |  | The total steps. |
 | type | union:&nbsp;'text'&nbsp;&#124;<br>&nbsp;'dots'&nbsp;&#124;<br>&nbsp;'progress'<br> | 'dots' | The type of mobile stepper to use. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

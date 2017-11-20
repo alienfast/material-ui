@@ -40,6 +40,9 @@ export const styles = (theme: Object) => ({
 
 type ProvidedProps = {
   classes: Object,
+  /**
+   * @ignore
+   */
   theme?: Object,
 };
 
@@ -175,6 +178,16 @@ class ButtonBase extends React.Component<ProvidedProps & Props, State> {
   componentDidMount() {
     this.button = findDOMNode(this);
     listenForFocusKeys();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    // The blur won't fire when the disabled state is set on a focused input.
+    // We need to book keep the focused state manually.
+    if (!this.props.disabled && nextProps.disabled) {
+      this.setState({
+        keyboardFocused: false,
+      });
+    }
   }
 
   componentWillUpdate(nextProps, nextState) {

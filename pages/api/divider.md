@@ -17,7 +17,7 @@ filename: /src/Divider/Divider.js
 | inset | boolean | false | If `true`, the divider will be indented. |
 | light | boolean | false | If `true`, the divider will have a lighter color. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

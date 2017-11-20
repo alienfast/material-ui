@@ -19,7 +19,7 @@ filename: /src/List/ListSubheader.js
 | disableSticky | boolean | false | If `true`, the List Subheader will not stick to the top during scroll. |
 | inset | boolean | false | If `true`, the List Subheader will be indented. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

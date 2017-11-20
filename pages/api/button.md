@@ -24,7 +24,7 @@ filename: /src/Button/Button.js
 | href | string |  | The URL to link to when the button is clicked. If defined, an `a` element will be used as the root node. |
 | raised | boolean | false | If `true`, the button will use raised styling. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

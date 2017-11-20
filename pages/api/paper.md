@@ -17,7 +17,7 @@ filename: /src/Paper/Paper.js
 | elevation | number | 2 | Shadow depth, corresponds to `dp` in the spec. It's accepting values between 0 and 24 inclusive. |
 | square | boolean | false | If `true`, rounded corners are disabled. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

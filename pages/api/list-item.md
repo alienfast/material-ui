@@ -20,7 +20,7 @@ filename: /src/List/ListItem.js
 | disableGutters | boolean | false | If `true`, the left and right padding is removed. |
 | divider | boolean | false | If `true`, a 1px light border is added to the bottom of the list item. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

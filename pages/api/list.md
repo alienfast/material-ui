@@ -20,7 +20,7 @@ filename: /src/List/List.js
 | rootRef | Function |  | Use that property to pass a ref callback to the root component. |
 | subheader | Node |  | The content of the component, normally `ListItem`. |
 
-Any other properties supplied will be [spread to the root element](/customization/api#spread).
+Any other properties supplied will be [spread to the root element](/guides/api#spread).
 
 ## CSS API
 

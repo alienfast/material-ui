@@ -34,6 +34,9 @@ export type Color = 'inherit' | 'accent' | 'action' | 'contrast' | 'disabled' | 
 
 type ProvidedProps = {
   classes: Object,
+  /**
+   * @ignore
+   */
   theme?: Object,
 };
 
@@ -50,6 +53,10 @@ export type Props = {
    * @ignore
    */
   className?: string,
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes?: Object,
   /**
    * The color of the component. It's using the theme palette when that makes sense.
    */

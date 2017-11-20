@@ -16,6 +16,9 @@ export const styles = (theme: Object) => ({
 
 type ProvidedProps = {
   classes: Object,
+  /**
+   * @ignore
+   */
   theme?: Object,
 };
 
@@ -28,6 +31,10 @@ export type Props = {
    * @ignore
    */
   className?: string,
+  /**
+   * Useful to extend the style applied to components.
+   */
+  classes?: Object,
   /**
    * Callback fired when the value changes.
    *
